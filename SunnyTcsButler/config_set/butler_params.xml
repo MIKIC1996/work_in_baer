@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <kernel>SunnyTCS Kernel</kernel>
+    <broker>SunnyTCS broker</broker>
+    <dataCenter>SunnyTCS DataCenter</dataCenter>
+    <logCenter>SunnyTCS LogCenter</logCenter>
+    <connector>SunnyTCS IntegraConnector</connector>
+</root>

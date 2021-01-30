@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <procedure name="Unnamed_procedure" explain="no explain">
+        <action actionName="unnamed_Action" actionExplain="none explain" actionType="0" actionCount="1" addXmlName="" addXmlAttributes="" addJsonType="0" addJsonValueList="" addJsonValueTypeList=""/>
+    </procedure>
+    <procedure name="配broker" explain="nadas ">
+        <action actionName="改IP" actionExplain="none explain" actionType="0" actionCount="1" addXmlName="" addXmlAttributes="" addJsonType="0" addJsonValueList="" addJsonValueTypeList="">
+            <target path="C:/SunnyTcs/config/logcenter.json">
+                <index>(0)</index>
+            </target>
+            <target path="C:/SunnyTcs/config/sunnytcs_data_center.json">
+                <index>(0)</index>
+            </target>
+            <target path="C:/SunnyTcs/config/sunnytcs_schedule_params.xml">
+                <index>(3)</index>
+            </target>
+        </action>
+        <action actionName="改端口" actionExplain="none explain" actionType="0" actionCount="1" addXmlName="" addXmlAttributes="" addJsonType="0" addJsonValueList="" addJsonValueTypeList="">
+            <target path="C:/SunnyTcs/config/logcenter.json">
+                <index>(1)</index>
+            </target>
+            <target path="C:/SunnyTcs/config/sunnytcs_data_center.json">
+                <index>(1)</index>
+            </target>
+            <target path="C:/SunnyTcs/config/sunnytcs_schedule_params.xml">
+                <index>(4)</index>
+            </target>
+        </action>
+    </procedure>
+</root>
