@@ -1,5 +1,0 @@
-http://admin@100.0.0.249:8445/r/SunnyTcsV3.git      |3.0 地址
-
-
-
-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  |token
