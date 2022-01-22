@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8"> 
+  <link rel="canonical" href="https://blog.csdn.net/yshuise/article/details/5917231"> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <meta name="renderer" content="webkit"> 
+  <meta name="force-rendering" content="webkit"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <meta name="report" content="{&quot;pid&quot;: &quot;blog&quot;, &quot;spm&quot;:&quot;1001.2101&quot;}"> 
+  <meta name="referrer" content="always"> 
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <link rel="alternate" media="handheld" href="#"> 
+  <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848"> 
+  <meta name="applicable-device" content="pc"> 
+  <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"> 
+  <title>（一）boost::lambda源码分析_yshuise的专栏-CSDN博客</title>  
+  <meta name="keywords" content="（一）boost::lambda源码分析"> 
+  <meta name="csdn-baidu-search" content="{&quot;autorun&quot;:true,&quot;install&quot;:true,&quot;keyword&quot;:&quot;（一）boost::lambda源码分析&quot;}"> 
+  <meta name="description" content="// is_instance_of_n&amp;lt;A, B&amp;gt;::value is true, if type A is// an instantiation of a template B, or A derives from an instantiation// of template B//// n is the number of template arguments for...">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-667d0b7e43.min.css">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin3-template/skin3-template-c298f9ecea.min.css">     
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css"> 
+  <style>
+        .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+    </style>  
+ </head> 
+ <body class="nodata " style="">    
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css"> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css"> 
+  <div class="main_father clearfix d-flex justify-content-center" style="height:100%;"> 
+   <div class="container clearfix" id="mainBox"> 
+    <main style="width:100%">  
+     <div class="blog-content-box"> 
+      <div class="article-header-box"> 
+       <div class="article-header"> 
+        <div class="article-title-box"> 
+         <h1 class="title-article" id="articleContentId">（一）boost::lambda源码分析</h1> 
+        </div> 
+        <div class="article-info-box"> 
+         <div class="article-bar-top"> 
+          <img class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png" alt=""> 
+          <div class="bar-content"> 
+           <img class="article-vip-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVip.png" alt=""> 
+           <span class="article-vip-text vip_article"> VIP文章</span> 
+           <a class="follow-nickName " href="https://blog.csdn.net/yshuise" target="_blank" rel="noopener">yshuise</a> 
+           <span class="time">2010-09-30 22:44:00</span> 
+           <img class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes.png" alt=""> 
+           <span class="read-count">2908</span> 
+           <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect.png" alt=""> <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive.png" alt=""> <span class="name">收藏</span> <span class="get-collection"> 1 </span> </a> 
+          </div> 
+         </div> 
+         <div class="blog-tags-box"> 
+          <div class="tags-box artic-tag-box"> 
+           <span class="label">分类专栏：</span> 
+           <a class="tag-link" href="https://blog.csdn.net/yshuise/category_271590.html" target="_blank" rel="noopener">C++&amp;amp;&amp;amp;算法&amp;amp;&amp;amp;设计模式</a> 
+           <span class="label">文章标签：</span> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;lambda&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=lambda&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">lambda</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;instantiation&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=instantiation&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">instantiation</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;class&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=class&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">class</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;templates&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=templates&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">templates</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;list&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=list&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">list</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;struct&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=struct&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">struct</a> 
+          </div> 
+         </div> 
+         <div class="slide-content-box"> 
+          <div class="article-copyright"> 
+           <div class="creativecommons">
+             版权声明：本文为博主原创文章，遵循
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。 
+           </div> 
+           <div class="article-source-link">
+             本文链接：
+            <a href="https://blog.csdn.net/yshuise/article/details/5917231" target="_blank">https://blog.csdn.net/yshuise/article/details/5917231</a> 
+           </div> 
+          </div> 
+         </div> 
+         <div class="operating"> 
+          <a class="href-article-edit slide-toggle">版权</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <article class="baidu_pl"> 
+       <div id="article_content" class="article_content clearfix"> 
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-d7093e7f7c.css"> 
+        <div id="content_views" class="htmledit_views"> 
+         <p>&nbsp;</p> 
+         <p><br><strong><span style="color:#993300;">// is_instance_of_n&lt;A, B&gt;::value is true, if type A is<br> // an instantiation of a template B, or A derives from an instantiation<br> // of template B<br> //<br> // n is the number of template arguments for B<br> //<br> // Example:<br> // is_instance_of_2&lt;std::istream, basic_stream&gt;::value == true</span></strong></p> 
+         <pre class="has"><code>​
+#ifndef BOOST_LAMBDA_IS_INSTANCE_OF #define BOOST_LAMBDA_IS_INSTANCE_OF #include "boost/config.hpp" // for BOOST_STATIC_CONSTANT #include "boost/type_traits/conversion_traits.hpp" // for is_convertible #include "boost/preprocessor/enum_shifted_params.hpp" 
+#include "boost/preprocessor/repeat_2nd.hpp" 
+// is_instance_of -------------------------------- // 
+// is_instance_of_n&lt;A, B&gt;::value is true, if type A is 
+// an instantiation of a template B, or A derives from an instantiation // of template B // 
+// n is the number of template arguments for B // 
+// Example:
+ // is_instance_of_2&lt;std::istream, basic_stream&gt;::value == true
+ // The original implementation was somewhat different, with different versions
+ // for different compilers. However, there was still a problem 
+// with gcc.3.0.2 and 3.0.3 compilers, which didn't think regard 
+// is_instance_of_N&lt;...&gt;::value was a constant. 
+// John Maddock suggested the way around this problem by building
+ // is_instance_of templates using boost::is_convertible.
+ // Now we only have one version of is_instance_of templates, which delagate 
+// all the nasty compiler tricks to is_convertible. 
+//BOOST_PP_COMMA_IF(N) 如果 cond 展开为 0, 则该宏展开为空。否则展开为一个逗号。
+ #define BOOST_LAMBDA_CLASS(z, N,A) BOOST_PP_COMMA_IF(N) 
+class #define BOOST_LAMBDA_CLASS_ARG(z, N,A) 
+BOOST_PP_COMMA_IF(N) class A##N 
+#define BOOST_LAMBDA_ARG(z, N,A) BOOST_PP_COMMA_IF(N) A##N 
+#define BOOST_LAMBDA_CLASS_LIST(n, NAME) BOOST_PP_REPEAT(n, BOOST_LAMBDA_CLASS, NAME) #define BOOST_LAMBDA_CLASS_ARG_LIST(n, NAME) BOOST_PP_REPEAT(n, BOOST_LAMBDA_CLASS_ARG, NAME) #define BOOST_LAMBDA_ARG_LIST(n, NAME) BOOST_PP_REPEAT(n, BOOST_LAMBDA_ARG, NAME) //假设 INDEX = 3， 下面的宏可以展示为： 
+// template&lt; template&lt;class,class, class&gt; class F&gt;
+ // struct conversion_tester_3{ 
+// template&lt;A0,A1,A2&gt; 
+// conversion_tester_3(const F&lt;A0,A1,A2&gt;); 
+// }; // 
+// template&lt;class From, template&lt;class, class, class&gt; class To&gt;
+ // struct is_instance_of_3 
+// { 
+// private: 
+// typedef ::boost::is_convertible&lt; 
+// From, 
+// detail::conversion_tester_3&lt;To&gt; 
+// &gt;helper_type; 
+// public: 
+// BOOST_STATIC_CONSTANT(bool, value = helper_type::value); 
+// 
+}; 
+// template &lt;class From, class To&gt;
+ // struct is_convertible : public true_type-or-false_type {}; 
+// 
+// 
+// 继承：如果一个类型为 From 的 imaginary lvalue（假想左值）可以转换为类型 To，则从 true_type 继承，否则从 false_type 继承。 
+// is_convertible&lt;int, double&gt; 从 true_type 继承。 
+// // is_convertible&lt;const int, double&gt;::type 是 true_type 类型。 
+// // is_convertible&lt;int* const, int*&gt;::value 是一个求值为 true 的 integral constant expression（整常表达式）。
+ // // is_convertible&lt;int const*, int*&gt;::value 是一个求值为 false 的 integral constant expression（整常表达式）：这个转换需要一个 const_cast。 
+// // is_convertible&lt;int const&amp;, long&gt;::value 是一个求值为 true 的 integral constant expression（整常表达式）。 
+// // is_convertible&lt;int&gt;::value 是一个求值为 false 的 integral constant expression（整常表达式）。 
+// // is_convertible&lt;T&gt;::value_type 是 bool 类型。 
+namespace boost { namespace lambda { #define BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE(INDEX) / / namespace detail {
+ / / template &lt;template&lt;BOOST_LAMBDA_CLASS_LIST(INDEX,T)&gt; class F&gt; / struct BOOST_PP_CAT(conversion_tester_,INDEX) { / template&lt;BOOST_LAMBDA_CLASS_ARG_LIST(INDEX,A)&gt; / BOOST_PP_CAT(conversion_tester_,INDEX) / (const F&lt;BOOST_LAMBDA_ARG_LIST(INDEX,A)&gt;&amp;); / }; / / } /* end detail */ / / template &lt;class From, template &lt;BOOST_LAMBDA_CLASS_LIST(INDEX,T)&gt; class To&gt; / struct BOOST_PP_CAT(is_instance_of_,INDEX) / { / private: / typedef ::boost::is_convertible&lt; / From, / BOOST_PP_CAT(detail::conversion_tester_,INDEX)&lt;To&gt; / &gt; helper_type; / / public: / BOOST_STATIC_CONSTANT(bool, value = helper_type::value); / }; #define BOOST_LAMBDA_HELPER(z, N, A) BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE( BOOST_PP_INC(N) ) // Generate the traits for 1-4 argument templates BOOST_PP_REPEAT_2ND(4,BOOST_LAMBDA_HELPER,FOO) 
+//BOOST_LAMBDA_HELPER(z,0,FOO), 
+//BOOST_LAMBDA_HELPER(z,1,FOO), 
+//BOOST_LAMBDA_HELPER(z,2,FOO), 
+//BOOST_LAMBDA_HELPER(z,3,FOO) //这样展开为： 
+//BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE( 1 ), 
+//BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE( 2 ),
+ //BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE( 3 ),
+ //BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE( 4 )
+ #undef BOOST_LAMBDA_HELPER
+ #undef BOOST_LAMBDA_IS_INSTANCE_OF_TEMPLATE #undef BOOST_LAMBDA_CLASS
+ #undef BOOST_LAMBDA_ARG #undef BOOST_LAMBDA_CLASS_ARG #undef BOOST_LAMBDA_CLASS_LIST #undef BOOST_LAMBDA_ARG_LIST #undef BOOST_LAMBDA_CLASS_ARG_LIST } // lambda } 
+// boost #endif
+
+&nbsp;
+
+​</code></pre> 
+         <p>&nbsp;</p> 
+        </div> 
+       </div> 
+       <div id="treeSkill"></div> 
+      </article> 
+     </div> 
+     <div class="more-toolbox-new" id="toolBarBox"> 
+      <div class="left-toolbox"> 
+       <div class="toolbox-left"> 
+        <div class="profile-box">
+         <a class="profile-href" target="_blank" href="https://blog.csdn.net/yshuise"><img class="profile-img" src="https://profile.csdnimg.cn/3/5/0/3_yshuise"><span class="profile-name">yshuise</span></a>
+        </div> 
+        <div class="profile-attend"> 
+         <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view="{&quot;mod&quot;:&quot;1592215036_002&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;extend1&quot;:&quot;关注&quot;}">关注</a> 
+         <a class="tool-item-follow active-animation" style="display:none;">关注</a> 
+        </div> 
+       </div> 
+       <div class="toolbox-middle">  
+       </div> 
+       <div class="toolbox-right"> 
+        <div class="tool-directory"> 
+         <a class="bt-columnlist-show" data-id="271590" data-free="true" data-subscribe="false" data-title="C++&amp;&amp;算法&amp;&amp;设计模式" data-img="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" data-url="https://blog.csdn.net/yshuise/category_271590.html" data-sum="81" data-people="1" data-price="0" data-oldprice="0" data-join="false" data-studyvip="false" data-studysubscribe="false" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}">专栏目录</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div>        
+     <a id="commentBox" name="commentBox"></a>       
+    </main>     
+   </div> 
+   <div class="recommend-right  align-items-stretch clearfix" id="rightAside" data-type="recommend"> 
+    <aside class="recommend-right_aside"> 
+     <div id="recommend-right"> 
+      <div class="flex-column aside-box groupfile" id="groupfile"> 
+       <div class="groupfile-div"> 
+        <h3 class="aside-title">目录</h3> 
+        <div class="align-items-stretch group_item"> 
+         <div class="pos-box"> 
+          <div class="scroll-box"> 
+           <div class="toc-box"></div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="aside-box kind_person d-flex flex-column"> 
+       <h3 class="aside-title">分类专栏</h3> 
+       <div class="align-items-stretch kindof_item" id="kind_person_column"> 
+        <div class="aside-content"> 
+         <ul> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_11572161.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_11572161.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756928.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">笔记</span> </span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_271590.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_271590.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">C++&amp;&amp;算法&amp;&amp;设计模式</span> </span> <span class="count float-right">81篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_472156.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_472156.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756757.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">社会、经济、哲学、军事、战略等等</span> </span> <span class="count float-right">30篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_275433.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_275433.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">资料</span> </span> <span class="count float-right">34篇</span> </a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </aside> 
+   </div> 
+  </div> 
+  <div class="mask-dark"></div>   
+  <div class="skin-boxshadow"></div> 
+  <div class="directory-boxshadow"></div> 
+  <div id="rewardNew" class="reward-popupbox-new"> 
+   <p class="rewad-title">打赏作者<span class="reward-close"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></span></p> 
+   <dl class="profile-box"> 
+    <dd> 
+     <a href="https://blog.csdn.net/yshuise" data-report-click="{&quot;mod&quot;:&quot;popu_379&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://profile.csdnimg.cn/3/5/0/3_yshuise" class="avatar_pic"> </a> 
+    </dd> 
+    <dt> 
+     <p class="blog-name">yshuise</p> 
+     <p class="blog-discript">权术横行</p> 
+    </dt> 
+   </dl> 
+   <div class="reward-box-new"> 
+    <div class="reward-content">
+     <div class="reward-right"></div>
+    </div> 
+   </div> 
+   <div class="money-box"> 
+    <span class="choose-money choosed" data-id="2">¥2</span> 
+    <span class="choose-money " data-id="4">¥4</span> 
+    <span class="choose-money " data-id="6">¥6</span> 
+    <span class="choose-money " data-id="10">¥10</span> 
+    <span class="choose-money " data-id="20">¥20</span> 
+    <input id="customizeMoney" class="customize-money" name="" type="" value="" placeholder="自定义"> 
+    <div class="customize-tip">
+     输入1-500的整数
+    </div> 
+   </div> 
+   <div class="pay-box"> 
+    <div class="pay-type-blance pay-type active" data-type="blance"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">余额支付</span> 
+     <span class="pay-type-num">(余额：-- )</span> 
+    </div> 
+    <div class="pay-type-money pay-type" data-type="money"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">扫码支付</span> 
+    </div> 
+   </div> 
+   <div class="sure-box"> 
+    <div class="sure-box-money"> 
+     <div class="code-box"> 
+      <div class="code-num-box"> 
+       <span class="code-name">扫码支付：</span>
+       <span class="code-num">¥2</span> 
+      </div> 
+      <div class="code-img-box"> 
+       <div class="renovate"> 
+        <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+        <span>获取中</span> 
+       </div> 
+      </div> 
+      <div class="code-pay-box"> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newWeiXin.png" alt=""> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newZhiFuBao.png" alt=""> 
+       <span>扫码支付</span> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sure-box-blance"> 
+     <p class="tip">您的余额不足，请更换扫码支付或<a target="_blank" data-report-click="{&quot;mod&quot;:&quot;1597646289_003&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4302&quot;}" href="https://i.csdn.net/#/wallet/balance/recharge?utm_source=RewardVip" class="go-invest">充值</a></p> 
+     <p class="is-have-money"><a class="reward-sure">打赏作者</a></p> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="pay-code"> 
+   <div class="pay-money">
+    实付
+    <span class="pay-money-span" data-nowprice="" data-oldprice="">元</span>
+   </div> 
+   <div class="content-blance">
+    <a class="blance-bt" href="javascript:;">使用余额支付</a>
+   </div> 
+   <div class="content-code"> 
+    <div id="payCode" data-id=""> 
+     <div class="renovate"> 
+      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+      <span>点击重新获取</span> 
+     </div> 
+    </div> 
+    <div class="pay-style">
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span>
+     <span class="text">扫码支付</span>
+    </div> 
+   </div> 
+   <div class="bt-close">
+    <svg t="1567152543821" class="icon" viewbox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+     <defs>
+      <style type="text/css"></style>
+     </defs>
+     <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+    </svg>
+   </div> 
+   <!-- <p style="margin-top: 8px;font-size: 14px;" class="text-center">支付成功即可阅读</p> --> 
+   <div class="pay-balance"> 
+    <input type="radio" class="pay-code-radio" data-type="details"> 
+    <span class="span">钱包余额</span> 
+    <span class="balance" style="color:#FC5531;font-size:14px;">0</span> 
+    <div class="pay-code-tile"> 
+     <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt=""> 
+     <div class="pay-code-content"> 
+      <div class="span"> 
+       <p class="title">抵扣说明：</p> 
+       <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、C币套餐、付费专栏及课程。</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a> 
+  </div> 
+  <div style="display:none;">  
+  </div>  
+  <!-- 富文本柱状图  --> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css">      
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css">                  
+ </body>
+</html>

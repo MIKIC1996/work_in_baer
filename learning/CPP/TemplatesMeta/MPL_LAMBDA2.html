@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8"> 
+  <link rel="canonical" href="https://blog.csdn.net/yshuise/article/details/5919030"> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <meta name="renderer" content="webkit"> 
+  <meta name="force-rendering" content="webkit"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <meta name="report" content="{&quot;pid&quot;: &quot;blog&quot;, &quot;spm&quot;:&quot;1001.2101&quot;}"> 
+  <meta name="referrer" content="always"> 
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <link rel="alternate" media="handheld" href="#"> 
+  <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848"> 
+  <meta name="applicable-device" content="pc"> 
+  <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"> 
+  <title>(二) boost::lambda 源码分析_yshuise的专栏-CSDN博客_boost lambda实现原理</title>  
+  <meta name="keywords" content="boost lambda实现原理"> 
+  <meta name="csdn-baidu-search" content="{&quot;autorun&quot;:true,&quot;install&quot;:true,&quot;keyword&quot;:&quot;boost lambda实现原理&quot;}"> 
+  <meta name="description" content="由于boost::lambda用了boost::tuple。那么对tuple关键的代码进行分析。tuple的使用很方面，也很简单，比如：boost::tuple&amp;lt;int,double,string&amp;gt; triple(42, 3.245, &quot;The amazing tuple!&quot;); int a0 = triple.get&amp;lt;0&amp;gt;(); double a1 = ...">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-667d0b7e43.min.css">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin3-template/skin3-template-c298f9ecea.min.css">     
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css"> 
+  <style>
+        .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+    </style>  
+ </head> 
+ <body class="nodata " style="">    
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css"> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css"> 
+  <div class="main_father clearfix d-flex justify-content-center" style="height:100%;"> 
+   <div class="container clearfix" id="mainBox"> 
+    <main style="width:100%">  
+     <div class="blog-content-box"> 
+      <div class="article-header-box"> 
+       <div class="article-header"> 
+        <div class="article-title-box"> 
+         <h1 class="title-article" id="articleContentId">(二) boost::lambda 源码分析</h1> 
+        </div> 
+        <div class="article-info-box"> 
+         <div class="article-bar-top"> 
+          <img class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png" alt=""> 
+          <div class="bar-content"> 
+           <img class="article-vip-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVip.png" alt=""> 
+           <span class="article-vip-text vip_article"> VIP文章</span> 
+           <a class="follow-nickName " href="https://blog.csdn.net/yshuise" target="_blank" rel="noopener">yshuise</a> 
+           <span class="time">2010-10-02 21:53:00</span> 
+           <img class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes.png" alt=""> 
+           <span class="read-count">2494</span> 
+           <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect.png" alt=""> <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive.png" alt=""> <span class="name">收藏</span> <span class="get-collection"> 1 </span> </a> 
+          </div> 
+         </div> 
+         <div class="blog-tags-box"> 
+          <div class="tags-box artic-tag-box"> 
+           <span class="label">分类专栏：</span> 
+           <a class="tag-link" href="https://blog.csdn.net/yshuise/category_271590.html" target="_blank" rel="noopener">C++&amp;amp;&amp;amp;算法&amp;amp;&amp;amp;设计模式</a> 
+           <span class="label">文章标签：</span> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;lambda&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=lambda&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">lambda</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;access&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=access&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">access</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;class&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=class&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">class</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;null&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=null&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">null</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;tuples&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=tuples&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">tuples</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;reference&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=reference&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">reference</a> 
+          </div> 
+         </div> 
+         <div class="slide-content-box"> 
+          <div class="article-copyright"> 
+           <div class="creativecommons">
+             版权声明：本文为博主原创文章，遵循
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。 
+           </div> 
+           <div class="article-source-link">
+             本文链接：
+            <a href="https://blog.csdn.net/yshuise/article/details/5919030" target="_blank">https://blog.csdn.net/yshuise/article/details/5919030</a> 
+           </div> 
+          </div> 
+         </div> 
+         <div class="operating"> 
+          <a class="href-article-edit slide-toggle">版权</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <article class="baidu_pl"> 
+       <div id="article_content" class="article_content clearfix"> 
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-d7093e7f7c.css"> 
+        <div id="content_views" class="htmledit_views"> 
+         <p>由于boost::lambda用了boost::tuple。</p> 
+         <p>那么对tuple关键的代码进行分析。</p> 
+         <p>tuple的使用很方面，也很简单，比如：</p> 
+         <pre class="has"><code>boost::tuple&lt;int,double,string&gt; triple(42, 3.245, "The amazing tuple!"); 
+int a0 = triple.get&lt;0&gt;(); 
+double a1 = triple.get&lt;1&gt;(); 
+string a2 = triple.get&lt;2&gt;();</code></pre> 
+         <p>&nbsp;</p> 
+         <p>tuple的源码如下：</p> 
+         <pre class="has"><code>// -- tuple ------------------------------------------------------
+ template &lt;class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9&gt; class tuple : public detail::map_tuple_to_cons&lt;T0, T1, T2, T3, T4, T5, T6, T7, T8, T9&gt;::type {
+ public: typedef typename detail::map_tuple_to_cons&lt;T0, T1, T2, T3, T4, T5, T6, T7, T8, T9&gt;::type inherited;
+ typedef typename inherited::head_type head_type;
+ typedef typename inherited::tail_type tail_type; // access_traits&lt;T&gt;::parameter_type takes non-reference types as const T&amp; tuple() {} tuple(typename access_traits&lt;T0&gt;::parameter_type t0) : inherited(t0, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {} 
+tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1) : inherited(t0, t1, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {} tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2) : inherited(t0, t1, t2, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {} 
+tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3) : inherited(t0, t1, t2, t3, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {} 
+tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4) : inherited(t0, t1, t2, t3, t4, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {}
+ tuple(typename access_traits&lt;T0&gt;::parameter_type t0,         typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4, typename access_traits&lt;T5&gt;::parameter_type t5) : inherited(t0, t1, t2, t3, t4, t5, detail::cnull(), detail::cnull(), detail::cnull(), detail::cnull()) {} 
+tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4, typename access_traits&lt;T5&gt;::parameter_type t5, typename access_traits&lt;T6&gt;::parameter_type t6) : inherited(t0, t1, t2, t3, t4, t5, t6, detail::cnull(), detail::cnull(), detail::cnull()) {}
+ tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4, typename access_traits&lt;T5&gt;::parameter_type t5, typename access_traits&lt;T6&gt;::parameter_type t6, typename access_traits&lt;T7&gt;::parameter_type t7) : inherited(t0, t1, t2, t3, t4, t5, t6, t7, detail::cnull(), detail::cnull()) {} tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4, typename access_traits&lt;T5&gt;::parameter_type t5, typename access_traits&lt;T6&gt;::parameter_type t6, typename access_traits&lt;T7&gt;::parameter_type t7, typename access_traits&lt;T8&gt;::parameter_type t8) : inherited(t0, t1, t2, t3, t4, t5, t6, t7, t8, detail::cnull()) {} 
+tuple(typename access_traits&lt;T0&gt;::parameter_type t0, typename access_traits&lt;T1&gt;::parameter_type t1, typename access_traits&lt;T2&gt;::parameter_type t2, typename access_traits&lt;T3&gt;::parameter_type t3, typename access_traits&lt;T4&gt;::parameter_type t4, typename access_traits&lt;T5&gt;::parameter_type t5, typename access_traits&lt;T6&gt;::parameter_type t6, typename access_traits&lt;T7&gt;::parameter_type t7, typename access_traits&lt;T8&gt;::parameter_type t8, typename access_traits&lt;T9&gt;::parameter_type t9) : inherited(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9) {} template&lt;class U1, class U2&gt; tuple(const cons&lt;U1, U2&gt;&amp; p) : inherited(p) {} 
+template &lt;class U1, class U2&gt; tuple&amp; operator=(const cons&lt;U1, U2&gt;&amp; k) { inherited::operator=(k); return *this; 
+} template &lt;class U1, class U2&gt; tuple&amp; operator=(const std::pair&lt;U1, U2&gt;&amp; k) { BOOST_STATIC_ASSERT(length&lt;tuple&gt;::value == 2);// check_length = 2 this-&gt;head = k.first; this-&gt;tail.head = k.second; return *this;
+ }
+ }; // The empty tuple template &lt;&gt; class tuple&lt;null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type&gt; : public null_type { public: typedef null_type inherited; };</code></pre> 
+         <p>&nbsp;</p> 
+         <p>其中tuple继承map_tuple_to_cons是这个类很关键的角色，它之所以能够存放类型和类型对应</p> 
+         <p>的变量(这个类是由cons类完成的)就是因为这个原因。</p> 
+         <p>而map_tuple_to_cons的实现方式也值得研究：</p> 
+         <p>&nbsp;</p> 
+         <p>template &lt;class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9&gt; struct map_tuple_to_cons { typedef cons&lt;T0, typename map_tuple_to_cons&lt;T1, T2, T3, T4, T5, T6, T7, T8, T9, null_type&gt;::type &gt; type; }; // The empty tuple is a null_type template &lt;&gt; struct map_tuple_to_cons&lt;null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type, null_type&gt; { typedef null_type type; };</p> 
+         <p>这个类，如果用cons来描述，展开的形式如下：</p> 
+         <p>cons&lt;T0,cons&lt;T1,cons&lt;T2,cons&lt;T3,cons&lt;T4,cons&lt;T5,cons&lt;T6,cons&lt;T7,cons&lt;T8,cons&lt;T9,null_type&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</p> 
+         <p>这样的形式才能形成模板递归。在《Modern C++ Design》这本书前面的章节，有许多关于这方面的讨论。</p> 
+         <p>形式上基本一样，不过tuple数据结构含有类型对应的变量。这点与书上不同的地方。</p> 
+         <p>访问元素的方式同书上一样。</p> 
+         <p>上面的inherited的类型是cons是一个嵌套的递归模板方式，因此构造函数的调用是调用：</p> 
+         <pre class="has"><code>template &lt;class HT, class TT&gt; struct cons { 
+typedef HT head_type;
+ typedef TT tail_type;
+ typedef typename detail::wrap_non_storeable_type&lt;head_type&gt;::type stored_head_type; stored_head_type head; 
+tail_type tail; 
+typename access_traits&lt;stored_head_type&gt;::non_const_type get_head() { return head; } typename access_traits&lt;tail_type&gt;::non_const_type get_tail() { return tail; }
+ typename access_traits&lt;stored_head_type&gt;::const_type get_head() const { return head; } typename access_traits&lt;tail_type&gt;::const_type get_tail() const { return tail; } cons() : head(), tail() {} // cons() : head(detail::default_arg&lt;HT&gt;::f()), tail() {}
+// the argument for head is not strictly needed, but it prevents 
+// array type elements. This is good, since array type elements
+ // cannot be supported properly in any case (no assignment,
+ // copy works only if the tails are exactly the same type, ...) 
+cons(typename access_traits&lt;stored_head_type&gt;::parameter_type h, const tail_type&amp; t) : head (h), tail(t) {} 
+template &lt;class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10&gt; cons( T1&amp; t1, T2&amp; t2, T3&amp; t3, T4&amp; t4, T5&amp; t5, T6&amp; t6, T7&amp; t7, T8&amp; t8, T9&amp; t9, T10&amp; t10 ) : head (t1), tail (t2, t3, t4, t5, t6, t7, t8, t9, t10, detail::cnull()) {} 
+template &lt;class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10&gt; cons( const null_type&amp; /*t1*/, T2&amp; t2, T3&amp; t3, T4&amp; t4, T5&amp; t5, T6&amp; t6, T7&amp; t7, T8&amp; t8, T9&amp; t9, T10&amp; t10 ) : head (), tail (t2, t3, t4, t5, t6, t7, t8, t9, t10, detail::cnull()) {} template &lt;class HT2, class TT2&gt; cons( const cons&lt;HT2, TT2&gt;&amp; u ) : head(u.head), tail(u.tail) {}
+ template &lt;class HT2, class TT2&gt; cons&amp; operator=( const cons&lt;HT2, TT2&gt;&amp; u ) { head=u.head; tail=u.tail; return *this; }
+ // must define assignment operator explicitly, implicit version is // illformed if HT is a reference (12.8. (12)) cons&amp; operator=(const cons&amp; u) { head = u.head; tail = u.tail; return *this; } template &lt;class T1, class T2&gt; cons&amp; operator=( const std::pair&lt;T1, T2&gt;&amp; u ) { BOOST_STATIC_ASSERT(length&lt;cons&gt;::value == 2);
+ // check length = 2 head = u.first; tail.head = u.second; return *this; } // get member functions (non-const and const) template &lt;int N&gt; typename access_traits&lt; typename element&lt;N, cons&lt;HT, TT&gt; &gt;::type &gt;::non_const_type get() { return boost::tuples::get&lt;N&gt;(*this); // delegate to non-member get } template &lt;int N&gt; typename access_traits&lt; typename element&lt;N, cons&lt;HT, TT&gt; &gt;::type &gt;::const_type get() const { return boost::tuples::get&lt;N&gt;(*this); // delegate to non-member get } }; 
+template &lt;class HT&gt; struct cons&lt;HT, null_type&gt; { typedef HT head_type;
+ typedef null_type tail_type; typedef cons&lt;HT, null_type&gt; self_type;
+ typedef typename detail::wrap_non_storeable_type&lt;head_type&gt;::type stored_head_type; stored_head_type head; 
+typename access_traits&lt;stored_head_type&gt;::non_const_type get_head() { return head; } null_type get_tail() { return null_type(); }
+ typename access_traits&lt;stored_head_type&gt;::const_type get_head() const { return head; } const null_type get_tail() const { return null_type(); } // cons() : head(detail::default_arg&lt;HT&gt;::f()) {} 
+cons() : head() {} 
+cons(typename access_traits&lt;stored_head_type&gt;::parameter_type h, const null_type&amp; = null_type()) : head (h) {}
+ template&lt;class T1&gt; cons(T1&amp; t1, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;) : head (t1) {} 
+cons(const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;, const null_type&amp;) : head () {} 
+template &lt;class HT2&gt; cons( const cons&lt;HT2, null_type&gt;&amp; u ) : head(u.head) {} template &lt;class HT2&gt; cons&amp; operator=(const cons&lt;HT2, null_type&gt;&amp; u ) { head = u.head; return *this; } // must define assignment operator explicitely, implicit version // is illformed if HT is a reference cons&amp; operator=(const cons&amp; u) { head = u.head; return *this; } template &lt;int N&gt; typename access_traits&lt; typename element&lt;N, self_type&gt;::type &gt;::non_const_type get(BOOST_EXPLICIT_TEMPLATE_NON_TYPE(int, N)) { return boost::tuples::get&lt;N&gt;(*this); 
+} 
+template &lt;int N&gt; typename access_traits&lt; typename element&lt;N, self_type&gt;::type &gt;::const_type get(BOOST_EXPLICIT_TEMPLATE_NON_TYPE(int, N)) const { return boost::tuples::get&lt;N&gt;(*this); 
+} 
+};</code></pre> 
+         <p>上面的代码特别注意构造函数的调用方式，会递归的调用的构造函数。</p> 
+         <p>其它同书上代码一样。而head实际上就是存放的变量，tail是末尾类型的变量，即可能是嵌套</p> 
+         <p>模板对象也可能是单个元素（类型）对象（最后）。通过递归的方式，把所有的类型及变量变得可以访问。</p> 
+         <p>&nbsp;</p> 
+        </div> 
+       </div> 
+       <div id="treeSkill"></div> 
+      </article> 
+     </div> 
+     <div class="more-toolbox-new" id="toolBarBox"> 
+      <div class="left-toolbox"> 
+       <div class="toolbox-left"> 
+        <div class="profile-box">
+         <a class="profile-href" target="_blank" href="https://blog.csdn.net/yshuise"><img class="profile-img" src="https://profile.csdnimg.cn/3/5/0/3_yshuise"><span class="profile-name">yshuise</span></a>
+        </div> 
+        <div class="profile-attend"> 
+         <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view="{&quot;mod&quot;:&quot;1592215036_002&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;extend1&quot;:&quot;关注&quot;}">关注</a> 
+         <a class="tool-item-follow active-animation" style="display:none;">关注</a> 
+        </div> 
+       </div> 
+       <div class="toolbox-middle">  
+       </div> 
+       <div class="toolbox-right"> 
+        <div class="tool-directory"> 
+         <a class="bt-columnlist-show" data-id="271590" data-free="true" data-subscribe="false" data-title="C++&amp;&amp;算法&amp;&amp;设计模式" data-img="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" data-url="https://blog.csdn.net/yshuise/category_271590.html" data-sum="81" data-people="1" data-price="0" data-oldprice="0" data-join="false" data-studyvip="false" data-studysubscribe="false" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}">专栏目录</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div>        
+     <a id="commentBox" name="commentBox"></a>       
+    </main>     
+   </div> 
+   <div class="recommend-right  align-items-stretch clearfix" id="rightAside" data-type="recommend"> 
+    <aside class="recommend-right_aside"> 
+     <div id="recommend-right"> 
+      <div class="flex-column aside-box groupfile" id="groupfile"> 
+       <div class="groupfile-div"> 
+        <h3 class="aside-title">目录</h3> 
+        <div class="align-items-stretch group_item"> 
+         <div class="pos-box"> 
+          <div class="scroll-box"> 
+           <div class="toc-box"></div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="aside-box kind_person d-flex flex-column"> 
+       <h3 class="aside-title">分类专栏</h3> 
+       <div class="align-items-stretch kindof_item" id="kind_person_column"> 
+        <div class="aside-content"> 
+         <ul> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_11572161.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_11572161.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756928.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">笔记</span> </span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_271590.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_271590.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">C++&amp;&amp;算法&amp;&amp;设计模式</span> </span> <span class="count float-right">81篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_472156.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_472156.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756757.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">社会、经济、哲学、军事、战略等等</span> </span> <span class="count float-right">30篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_275433.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_275433.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">资料</span> </span> <span class="count float-right">34篇</span> </a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </aside> 
+   </div> 
+  </div> 
+  <div class="mask-dark"></div>   
+  <div class="skin-boxshadow"></div> 
+  <div class="directory-boxshadow"></div> 
+  <div id="rewardNew" class="reward-popupbox-new"> 
+   <p class="rewad-title">打赏作者<span class="reward-close"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></span></p> 
+   <dl class="profile-box"> 
+    <dd> 
+     <a href="https://blog.csdn.net/yshuise" data-report-click="{&quot;mod&quot;:&quot;popu_379&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://profile.csdnimg.cn/3/5/0/3_yshuise" class="avatar_pic"> </a> 
+    </dd> 
+    <dt> 
+     <p class="blog-name">yshuise</p> 
+     <p class="blog-discript">权术横行</p> 
+    </dt> 
+   </dl> 
+   <div class="reward-box-new"> 
+    <div class="reward-content">
+     <div class="reward-right"></div>
+    </div> 
+   </div> 
+   <div class="money-box"> 
+    <span class="choose-money choosed" data-id="2">¥2</span> 
+    <span class="choose-money " data-id="4">¥4</span> 
+    <span class="choose-money " data-id="6">¥6</span> 
+    <span class="choose-money " data-id="10">¥10</span> 
+    <span class="choose-money " data-id="20">¥20</span> 
+    <input id="customizeMoney" class="customize-money" name="" type="" value="" placeholder="自定义"> 
+    <div class="customize-tip">
+     输入1-500的整数
+    </div> 
+   </div> 
+   <div class="pay-box"> 
+    <div class="pay-type-blance pay-type active" data-type="blance"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">余额支付</span> 
+     <span class="pay-type-num">(余额：-- )</span> 
+    </div> 
+    <div class="pay-type-money pay-type" data-type="money"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">扫码支付</span> 
+    </div> 
+   </div> 
+   <div class="sure-box"> 
+    <div class="sure-box-money"> 
+     <div class="code-box"> 
+      <div class="code-num-box"> 
+       <span class="code-name">扫码支付：</span>
+       <span class="code-num">¥2</span> 
+      </div> 
+      <div class="code-img-box"> 
+       <div class="renovate"> 
+        <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+        <span>获取中</span> 
+       </div> 
+      </div> 
+      <div class="code-pay-box"> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newWeiXin.png" alt=""> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newZhiFuBao.png" alt=""> 
+       <span>扫码支付</span> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sure-box-blance"> 
+     <p class="tip">您的余额不足，请更换扫码支付或<a target="_blank" data-report-click="{&quot;mod&quot;:&quot;1597646289_003&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4302&quot;}" href="https://i.csdn.net/#/wallet/balance/recharge?utm_source=RewardVip" class="go-invest">充值</a></p> 
+     <p class="is-have-money"><a class="reward-sure">打赏作者</a></p> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="pay-code"> 
+   <div class="pay-money">
+    实付
+    <span class="pay-money-span" data-nowprice="" data-oldprice="">元</span>
+   </div> 
+   <div class="content-blance">
+    <a class="blance-bt" href="javascript:;">使用余额支付</a>
+   </div> 
+   <div class="content-code"> 
+    <div id="payCode" data-id=""> 
+     <div class="renovate"> 
+      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+      <span>点击重新获取</span> 
+     </div> 
+    </div> 
+    <div class="pay-style">
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span>
+     <span class="text">扫码支付</span>
+    </div> 
+   </div> 
+   <div class="bt-close">
+    <svg t="1567152543821" class="icon" viewbox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+     <defs>
+      <style type="text/css"></style>
+     </defs>
+     <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+    </svg>
+   </div> 
+   <!-- <p style="margin-top: 8px;font-size: 14px;" class="text-center">支付成功即可阅读</p> --> 
+   <div class="pay-balance"> 
+    <input type="radio" class="pay-code-radio" data-type="details"> 
+    <span class="span">钱包余额</span> 
+    <span class="balance" style="color:#FC5531;font-size:14px;">0</span> 
+    <div class="pay-code-tile"> 
+     <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt=""> 
+     <div class="pay-code-content"> 
+      <div class="span"> 
+       <p class="title">抵扣说明：</p> 
+       <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、C币套餐、付费专栏及课程。</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a> 
+  </div> 
+  <div style="display:none;">  
+  </div>  
+  <!-- 富文本柱状图  --> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css">      
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css">                  
+ </body>
+</html>

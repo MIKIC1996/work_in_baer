@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8"> 
+  <link rel="canonical" href="https://blog.csdn.net/yshuise/article/details/4225711"> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <meta name="renderer" content="webkit"> 
+  <meta name="force-rendering" content="webkit"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <meta name="report" content="{&quot;pid&quot;: &quot;blog&quot;, &quot;spm&quot;:&quot;1001.2101&quot;}"> 
+  <meta name="referrer" content="always"> 
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <link rel="alternate" media="handheld" href="#"> 
+  <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848"> 
+  <meta name="applicable-device" content="pc"> 
+  <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"> 
+  <title>boost::mpl::vector(MSVC)源码分析_yshuise的专栏-CSDN博客</title>  
+  <meta name="keywords" content="boost::mpl::vector(MSVC)源码分析"> 
+  <meta name="csdn-baidu-search" content="{&quot;autorun&quot;:true,&quot;install&quot;:true,&quot;keyword&quot;:&quot;boost::mpl::vector(MSVC)源码分析&quot;}"> 
+  <meta name="description" content="代码看起来很直接，没有前面宏定义那么复杂。但头文件的相互包括比较复杂。如果仅仅是利用VS助手来寻找代码，出错的可能性非常之大。对于模板元的调试非常的特殊。正确的代码是不能调试的，而是故意把它写错:比如，vector1只能存放一个元素，那么故意写成两个元素，超出了界限，编译器自然会报错。这样可以知道编译器调用的是什么地方的代码了。否则调用的是什么地方的代码都不知道（花了大量的时间来寻找代码...">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-667d0b7e43.min.css">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin3-template/skin3-template-c298f9ecea.min.css">     
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css"> 
+  <style>
+        .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+    </style>  
+ </head> 
+ <body class="nodata " style="">    
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css"> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css"> 
+  <div class="main_father clearfix d-flex justify-content-center" style="height:100%;"> 
+   <div class="container clearfix" id="mainBox"> 
+    <main style="width:100%">  
+     <div class="blog-content-box"> 
+      <div class="article-header-box"> 
+       <div class="article-header"> 
+        <div class="article-title-box"> 
+         <h1 class="title-article" id="articleContentId">boost::mpl::vector(MSVC)源码分析</h1> 
+        </div> 
+        <div class="article-info-box"> 
+         <div class="article-bar-top"> 
+          <img class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png" alt=""> 
+          <div class="bar-content"> 
+           <img class="article-vip-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/identityVip.png" alt=""> 
+           <span class="article-vip-text vip_article"> VIP文章</span> 
+           <a class="follow-nickName " href="https://blog.csdn.net/yshuise" target="_blank" rel="noopener">yshuise</a> 
+           <span class="time">2009-05-30 12:34:00</span> 
+           <img class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes.png" alt=""> 
+           <span class="read-count">1789</span> 
+           <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect.png" alt=""> <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive.png" alt=""> <span class="name">收藏</span> <span class="get-collection"> </span> </a> 
+          </div> 
+         </div> 
+         <div class="blog-tags-box"> 
+          <div class="tags-box artic-tag-box"> 
+           <span class="label">分类专栏：</span> 
+           <a class="tag-link" href="https://blog.csdn.net/yshuise/category_271590.html" target="_blank" rel="noopener">C++&amp;amp;&amp;amp;算法&amp;amp;&amp;amp;设计模式</a> 
+           <span class="label">文章标签：</span> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;vector&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=vector&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">vector</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;struct&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=struct&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">struct</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;iterator&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=iterator&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">iterator</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;random&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=random&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">random</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;access&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=access&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">access</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;lambda&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=lambda&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">lambda</a> 
+          </div> 
+         </div> 
+         <div class="slide-content-box"> 
+          <div class="article-copyright"> 
+           <div class="creativecommons">
+             版权声明：本文为博主原创文章，遵循
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。 
+           </div> 
+           <div class="article-source-link">
+             本文链接：
+            <a href="https://blog.csdn.net/yshuise/article/details/4225711" target="_blank">https://blog.csdn.net/yshuise/article/details/4225711</a> 
+           </div> 
+          </div> 
+         </div> 
+         <div class="operating"> 
+          <a class="href-article-edit slide-toggle">版权</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <article class="baidu_pl"> 
+       <div id="article_content" class="article_content clearfix"> 
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-d7093e7f7c.css"> 
+        <div id="content_views" class="htmledit_views"> 
+         <pre class="has"><code>代码看起来很直接，没有前面宏定义那么复杂。但头文件的相互包括比较复杂。
+如果仅仅是利用VS助手来寻找代码，出错的可能性非常之大。
+对于模板元的调试非常的特殊。正确的代码是不能调试的，而是故意把它写错:比如，
+vector1只能存放一个元素，那么故意写成两个元素，超出了界限，编译器自然会报错。
+这样可以知道编译器调用的是什么地方的代码了。否则调用的是什么地方的代码都不知道（花了大量的时间来寻找代码）。
+有些模板仅仅是声明没有定义。这样只是起一个标记作用，用类型来标记。这个vector同那个vector是不同的。比如：vector_tag&lt;1&gt;和vector_tag&lt;2&gt;就是不同，他们代表不同的类型。它的差异仅仅用类型就可以做到。网上仅有一篇博客说是定义，这儿显然是不对。如果是定义可以生成对像，我试了aux::vector_tag不能生成对像。
+// Copyright Aleksey Gurtovoy 2000-2004
+//
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+// Preprocessed version of "boost/mpl/vector/vector10.hpp" header
+// -- DO NOT modify by hand!
+#   define BOOST_MPL_AUX_NTTP_DECL(T, x) T x /**/
+struct v_iter_tag;//仅仅是一个标志
+struct integral_c_tag { BOOST_STATIC_CONSTANT(int, value = 0); };
+template&lt; int  N&gt;
+struct int_
+{
+    enum { value = N };
+    typedef  int   type;
+    typedef  int_  value_type;
+    typedef integral_c_tag tag;
+    typedef int_&lt;value+1&gt; next;
+    typedef int_&lt;value-1&gt; prior;
+    // enables uniform function call syntax for families of overloaded
+    // functions that return objects of both arithmetic ('int', 'long',
+    // 'double', etc.) and wrapped integral types (for an example, see
+    // "mpl/example/power.cpp")
+    operator int() const { return static_cast&lt;int&gt;(this-&gt;value); }
+};
+namespace boost { namespace mpl {
+//起标记作用。同STL的代码这点来说很相似。
+    struct forward_iterator_tag       : int_&lt;0&gt; { typedef forward_iterator_tag type; };
+    struct bidirectional_iterator_tag : int_&lt;1&gt; { typedef bidirectional_iterator_tag type; };
+    struct random_access_iterator_tag : int_&lt;2&gt; { typedef random_access_iterator_tag type; };
+}}
+#   define BOOST_MPL_AUX_COMMON_NAME_WKND(name) /**/
+#define BOOST_MPL_AUX_NA_PARAM(param) param = na
+namespace boost { namespace mpl {
+        BOOST_MPL_AUX_COMMON_NAME_WKND(next)
+        BOOST_MPL_AUX_COMMON_NAME_WKND(prior)
+        template&lt;
+        typename BOOST_MPL_AUX_NA_PARAM(T)// typename T = na
+        &gt;
+        struct next
+        {
+            typedef typename T::next type;
+            BOOST_MPL_AUX_LAMBDA_SUPPORT(1,next,(T))
+        };
+        template&lt;
+            typename BOOST_MPL_AUX_NA_PARAM(T)
+        &gt;
+        struct prior
+        {
+            typedef typename T::prior type;
+            BOOST_MPL_AUX_LAMBDA_SUPPORT(1,prior,(T))
+        };
+        BOOST_MPL_AUX_NA_SPEC(1, next)
+        BOOST_MPL_AUX_NA_SPEC(1, prior)
+}}
+namespace boost { namespace mpl {
+    //#   define BOOST_MPL_AUX_NTTP_DECL(T, x) T x /**/
+    template&lt;
+        typename Vector
+        ,long n_
+    &gt;
+    struct v_iter
+    {
+        typedef aux::v_iter_tag tag; //标记
+        typedef random_access_iterator_tag category;//迭代器类型
+        typedef typename v_at&lt;Vector,n_&gt;::type type;//这是在vector中特化的版本。
+        typedef Vector vector_;
+        typedef mpl::long_&lt;n_&gt; pos;
+#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+        enum {
+            next_ = n_ + 1
+            , prior_ = n_ - 1
+            , pos_ = n_
+        };
+        typedef v_iter&lt;Vector,next_&gt; next; //实际上重新生成一个v_iter
+        typedef v_iter&lt;Vector,prior_&gt; prior;
+#endif
+    };
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+    template&lt;
+        typename Vector
+        , BOOST_MPL_AUX_NTTP_DECL(long, n_)//long n_
+    &gt;
+    struct next&lt; v_iter&lt;Vector,n_&gt; &gt;//这儿来看，显然不主模版。因为这儿只有一个参数v_iter,是一个特化版本。
+    {
+        typedef v_iter&lt;Vector,(n_ + 1)&gt; type;//重新生成一个v_iter
+    };
+    template&lt;
+        typename Vector
+        , BOOST_MPL_AUX_NTTP_DECL(long, n_)
+    &gt;
+    struct prior&lt; v_iter&lt;Vector,n_&gt; &gt;//同上面一样。
+    {
+        typedef v_iter&lt;Vector,(n_ - 1)&gt; type;//重新生成一个v_iter
+    };
+#   define BOOST_MPL_AUX_NESTED_VALUE_WKND(T, C) /
+    BOOST_MPL_AUX_VALUE_WKND(C)::value /
+    /**/
+    #   define BOOST_MPL_AUX_VALUE_WKND(C) C
+#endif
+}}
+#endif // BOOST_MPL_AUX_VECTOR_ITERATOR_HPP_INCLUDED
+namespace boost { namespace mpl {
+    //特化版本，在其他地方声明
+    template&lt; typename V &gt;
+    struct v_at&lt; V,0 &gt;
+    {
+        typedef typename V::item0 type;//V代表的是vector,item0就是第一个元素值。
+    };
+    template&lt;
+        typename T0
+    &gt;
+    struct vector1
+    {  //这仅是一个标记，只对它进行了声明，没有对它进行定义。代表一个特定的类型。
+        typedef aux::vector_tag&lt;1&gt; tag;
+        typedef vector1 type;
+        typedef T0 item0;//vector1存放的元素T0
+        typedef void_ item1;//
+        typedef T0 back;
+        typedef v_iter&lt; type,0 &gt; begin; //
+        typedef v_iter&lt; type,1 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;0&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector1&lt;//只有一个元素，重新生成一个vector1即可。
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;1&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector0&lt;  //对于vector1来说，pop出一个元素之后，就没有任何元素了。
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;0&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector1&lt; //同样重新生成一个vector1，模板元是不能改变其元素值。
+                             //要改变只得重新生成一个新的vector。
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;1&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector0&lt;//对于只有一个元素的vector,pop之后就没有任何元素了。
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,1 &gt;
+    {
+        typedef typename V::item1 type;//vector的第二个元素值，比较直接。
+    };
+//下面的特化版本同上面的非常类似。而代码写得很清晰，而又直接。
+    template&lt;
+        typename T0, typename T1
+    &gt;
+    struct vector2
+    {
+        typedef aux::vector_tag&lt;2&gt; tag;
+        typedef vector2 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef void_ item2;
+        typedef T1 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,2 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;1&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector2&lt;
+                T
+                ,
+                typename Vector::item0
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;2&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector1&lt;
+                typename Vector::item1
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;1&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector2&lt;
+                typename Vector::item0
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;2&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector1&lt;
+                typename Vector::item0
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,2 &gt;
+    {
+        typedef typename V::item2 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2
+    &gt;
+    struct vector3
+    {
+        typedef aux::vector_tag&lt;3&gt; tag;
+        typedef vector3 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef void_ item3;
+        typedef T2 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,3 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;2&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector3&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;3&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector2&lt;
+                typename Vector::item1, typename Vector::item2
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;2&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector3&lt;
+                typename Vector::item0, typename Vector::item1
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;3&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector2&lt;
+                typename Vector::item0, typename Vector::item1
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,3 &gt;
+    {
+        typedef typename V::item3 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3
+    &gt;
+    struct vector4
+    {
+        typedef aux::vector_tag&lt;4&gt; tag;
+        typedef vector4 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef void_ item4;
+        typedef T3 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,4 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;3&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector4&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;4&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector3&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;3&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector4&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;4&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector3&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,4 &gt;
+    {
+        typedef typename V::item4 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+    &gt;
+    struct vector5
+    {
+        typedef aux::vector_tag&lt;5&gt; tag;
+        typedef vector5 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef void_ item5;
+        typedef T4 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,5 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;4&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector5&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;5&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector4&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;4&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector5&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;5&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector4&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,5 &gt;
+    {
+        typedef typename V::item5 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+        , typename T5
+    &gt;
+    struct vector6
+    {
+        typedef aux::vector_tag&lt;6&gt; tag;
+        typedef vector6 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef T5 item5;
+        typedef void_ item6;
+        typedef T5 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,6 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;5&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector6&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;6&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector5&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+                , typename Vector::item5
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;5&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector6&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;6&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector5&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,6 &gt;
+    {
+        typedef typename V::item6 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+        , typename T5, typename T6
+    &gt;
+    struct vector7
+    {
+        typedef aux::vector_tag&lt;7&gt; tag;
+        typedef vector7 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef T5 item5;
+        typedef T6 item6;
+        typedef void_ item7;
+        typedef T6 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,7 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;6&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector7&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;7&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector6&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+                , typename Vector::item5, typename Vector::item6
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;6&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector7&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;7&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector6&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,7 &gt;
+    {
+        typedef typename V::item7 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+        , typename T5, typename T6, typename T7
+    &gt;
+    struct vector8
+    {
+        typedef aux::vector_tag&lt;8&gt; tag;
+        typedef vector8 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef T5 item5;
+        typedef T6 item6;
+        typedef T7 item7;
+        typedef void_ item8;
+        typedef T7 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,8 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;7&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector8&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;8&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector7&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+                , typename Vector::item5, typename Vector::item6
+                , typename Vector::item7
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;7&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector8&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;8&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector7&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,8 &gt;
+    {
+        typedef typename V::item8 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+        , typename T5, typename T6, typename T7, typename T8
+    &gt;
+    struct vector9
+    {
+        typedef aux::vector_tag&lt;9&gt; tag;
+        typedef vector9 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef T5 item5;
+        typedef T6 item6;
+        typedef T7 item7;
+        typedef T8 item8;
+        typedef void_ item9;
+        typedef T8 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,9 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;8&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector9&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;9&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector8&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+                , typename Vector::item5, typename Vector::item6
+                , typename Vector::item7, typename Vector::item8
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;8&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector9&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;9&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector8&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,9 &gt;
+    {
+        typedef typename V::item9 type;
+    };
+    template&lt;
+        typename T0, typename T1, typename T2, typename T3, typename T4
+        , typename T5, typename T6, typename T7, typename T8, typename T9
+    &gt;
+    struct vector10
+    {   //vector_tag只有声明，没有定义。在这儿表示类型,不需要定义，只是一个标记。
+        typedef aux::vector_tag&lt;10&gt; tag;
+        typedef vector10 type;
+        typedef T0 item0;
+        typedef T1 item1;
+        typedef T2 item2;
+        typedef T3 item3;
+        typedef T4 item4;
+        typedef T5 item5;
+        typedef T6 item6;
+        typedef T7 item7;
+        typedef T8 item8;
+        typedef T9 item9;
+        typedef void_ item10;
+        typedef T9 back;
+        typedef v_iter&lt; type,0 &gt; begin;
+        typedef v_iter&lt; type,10 &gt; end;
+    };
+    template&lt;&gt;
+    struct push_front_impl&lt; aux::vector_tag&lt;9&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector10&lt;
+                T
+                ,
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+                , typename Vector::item8
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_front_impl&lt; aux::vector_tag&lt;10&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector9&lt;
+                typename Vector::item1, typename Vector::item2
+                , typename Vector::item3, typename Vector::item4
+                , typename Vector::item5, typename Vector::item6
+                , typename Vector::item7, typename Vector::item8
+                , typename Vector::item9
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct push_back_impl&lt; aux::vector_tag&lt;9&gt; &gt;
+    {
+        template&lt; typename Vector, typename T &gt; struct apply
+        {
+            typedef vector10&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+                , typename Vector::item8
+                ,
+                T
+            &gt; type;
+        };
+    };
+    template&lt;&gt;
+    struct pop_back_impl&lt; aux::vector_tag&lt;10&gt; &gt;
+    {
+        template&lt; typename Vector &gt; struct apply
+        {
+            typedef vector9&lt;
+                typename Vector::item0, typename Vector::item1
+                , typename Vector::item2, typename Vector::item3
+                , typename Vector::item4, typename Vector::item5
+                , typename Vector::item6, typename Vector::item7
+                , typename Vector::item8
+            &gt; type;
+        };
+    };
+    template&lt; typename V &gt;
+    struct v_at&lt; V,10 &gt;
+    {
+        typedef typename V::item10 type;
+    };
+}}</code></pre> 
+         <p>&nbsp;</p> 
+        </div> 
+       </div> 
+       <div id="treeSkill"></div> 
+      </article> 
+     </div> 
+     <div class="more-toolbox-new" id="toolBarBox"> 
+      <div class="left-toolbox"> 
+       <div class="toolbox-left"> 
+        <div class="profile-box">
+         <a class="profile-href" target="_blank" href="https://blog.csdn.net/yshuise"><img class="profile-img" src="https://profile.csdnimg.cn/3/5/0/3_yshuise"><span class="profile-name">yshuise</span></a>
+        </div> 
+        <div class="profile-attend"> 
+         <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view="{&quot;mod&quot;:&quot;1592215036_002&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;extend1&quot;:&quot;关注&quot;}">关注</a> 
+         <a class="tool-item-follow active-animation" style="display:none;">关注</a> 
+        </div> 
+       </div> 
+       <div class="toolbox-middle">  
+       </div> 
+       <div class="toolbox-right"> 
+        <div class="tool-directory"> 
+         <a class="bt-columnlist-show" data-id="271590" data-free="true" data-subscribe="false" data-title="C++&amp;&amp;算法&amp;&amp;设计模式" data-img="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" data-url="https://blog.csdn.net/yshuise/category_271590.html" data-sum="81" data-people="1" data-price="0" data-oldprice="0" data-join="false" data-studyvip="false" data-studysubscribe="false" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}">专栏目录</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div>        
+     <a id="commentBox" name="commentBox"></a>       
+    </main>     
+   </div> 
+   <div class="recommend-right  align-items-stretch clearfix" id="rightAside" data-type="recommend"> 
+    <aside class="recommend-right_aside"> 
+     <div id="recommend-right"> 
+      <div class="flex-column aside-box groupfile" id="groupfile"> 
+       <div class="groupfile-div"> 
+        <h3 class="aside-title">目录</h3> 
+        <div class="align-items-stretch group_item"> 
+         <div class="pos-box"> 
+          <div class="scroll-box"> 
+           <div class="toc-box"></div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="aside-box kind_person d-flex flex-column"> 
+       <h3 class="aside-title">分类专栏</h3> 
+       <div class="align-items-stretch kindof_item" id="kind_person_column"> 
+        <div class="aside-content"> 
+         <ul> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_11572161.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_11572161.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756928.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">笔记</span> </span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_271590.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_271590.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">C++&amp;&amp;算法&amp;&amp;设计模式</span> </span> <span class="count float-right">81篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_472156.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_472156.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756757.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">社会、经济、哲学、军事、战略等等</span> </span> <span class="count float-right">30篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_275433.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_275433.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">资料</span> </span> <span class="count float-right">34篇</span> </a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </aside> 
+   </div> 
+  </div> 
+  <div class="mask-dark"></div>   
+  <div class="skin-boxshadow"></div> 
+  <div class="directory-boxshadow"></div> 
+  <div id="rewardNew" class="reward-popupbox-new"> 
+   <p class="rewad-title">打赏作者<span class="reward-close"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></span></p> 
+   <dl class="profile-box"> 
+    <dd> 
+     <a href="https://blog.csdn.net/yshuise" data-report-click="{&quot;mod&quot;:&quot;popu_379&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://profile.csdnimg.cn/3/5/0/3_yshuise" class="avatar_pic"> </a> 
+    </dd> 
+    <dt> 
+     <p class="blog-name">yshuise</p> 
+     <p class="blog-discript">权术横行</p> 
+    </dt> 
+   </dl> 
+   <div class="reward-box-new"> 
+    <div class="reward-content">
+     <div class="reward-right"></div>
+    </div> 
+   </div> 
+   <div class="money-box"> 
+    <span class="choose-money choosed" data-id="2">¥2</span> 
+    <span class="choose-money " data-id="4">¥4</span> 
+    <span class="choose-money " data-id="6">¥6</span> 
+    <span class="choose-money " data-id="10">¥10</span> 
+    <span class="choose-money " data-id="20">¥20</span> 
+    <input id="customizeMoney" class="customize-money" name="" type="" value="" placeholder="自定义"> 
+    <div class="customize-tip">
+     输入1-500的整数
+    </div> 
+   </div> 
+   <div class="pay-box"> 
+    <div class="pay-type-blance pay-type active" data-type="blance"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">余额支付</span> 
+     <span class="pay-type-num">(余额：-- )</span> 
+    </div> 
+    <div class="pay-type-money pay-type" data-type="money"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">扫码支付</span> 
+    </div> 
+   </div> 
+   <div class="sure-box"> 
+    <div class="sure-box-money"> 
+     <div class="code-box"> 
+      <div class="code-num-box"> 
+       <span class="code-name">扫码支付：</span>
+       <span class="code-num">¥2</span> 
+      </div> 
+      <div class="code-img-box"> 
+       <div class="renovate"> 
+        <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+        <span>获取中</span> 
+       </div> 
+      </div> 
+      <div class="code-pay-box"> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newWeiXin.png" alt=""> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newZhiFuBao.png" alt=""> 
+       <span>扫码支付</span> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sure-box-blance"> 
+     <p class="tip">您的余额不足，请更换扫码支付或<a target="_blank" data-report-click="{&quot;mod&quot;:&quot;1597646289_003&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4302&quot;}" href="https://i.csdn.net/#/wallet/balance/recharge?utm_source=RewardVip" class="go-invest">充值</a></p> 
+     <p class="is-have-money"><a class="reward-sure">打赏作者</a></p> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="pay-code"> 
+   <div class="pay-money">
+    实付
+    <span class="pay-money-span" data-nowprice="" data-oldprice="">元</span>
+   </div> 
+   <div class="content-blance">
+    <a class="blance-bt" href="javascript:;">使用余额支付</a>
+   </div> 
+   <div class="content-code"> 
+    <div id="payCode" data-id=""> 
+     <div class="renovate"> 
+      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+      <span>点击重新获取</span> 
+     </div> 
+    </div> 
+    <div class="pay-style">
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span>
+     <span class="text">扫码支付</span>
+    </div> 
+   </div> 
+   <div class="bt-close">
+    <svg t="1567152543821" class="icon" viewbox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+     <defs>
+      <style type="text/css"></style>
+     </defs>
+     <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+    </svg>
+   </div> 
+   <!-- <p style="margin-top: 8px;font-size: 14px;" class="text-center">支付成功即可阅读</p> --> 
+   <div class="pay-balance"> 
+    <input type="radio" class="pay-code-radio" data-type="details"> 
+    <span class="span">钱包余额</span> 
+    <span class="balance" style="color:#FC5531;font-size:14px;">0</span> 
+    <div class="pay-code-tile"> 
+     <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt=""> 
+     <div class="pay-code-content"> 
+      <div class="span"> 
+       <p class="title">抵扣说明：</p> 
+       <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、C币套餐、付费专栏及课程。</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a> 
+  </div> 
+  <div style="display:none;">  
+  </div>  
+  <!-- 富文本柱状图  --> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css">      
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css">                  
+ </body>
+</html>

@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8"> 
+  <link rel="canonical" href="https://blog.csdn.net/yshuise/article/details/5919585"> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <meta name="renderer" content="webkit"> 
+  <meta name="force-rendering" content="webkit"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <meta name="report" content="{&quot;pid&quot;: &quot;blog&quot;, &quot;spm&quot;:&quot;1001.2101&quot;}"> 
+  <meta name="referrer" content="always"> 
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <link rel="alternate" media="handheld" href="#"> 
+  <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848"> 
+  <meta name="applicable-device" content="pc"> 
+  <link href="https://g.csdnimg.cn/static/logo/favicon32.ico" rel="shortcut icon" type="image/x-icon"> 
+  <title>(三)boost::lambda源码分析_yshuise的专栏-CSDN博客_boost lambda实现原理</title>  
+  <meta name="keywords" content="boost lambda实现原理"> 
+  <meta name="csdn-baidu-search" content="{&quot;autorun&quot;:true,&quot;install&quot;:true,&quot;keyword&quot;:&quot;boost lambda实现原理&quot;}"> 
+  <meta name="description" content="本文是lambda分析篇最重要的一篇。lambda源码比较庞大（把宏全部展开），只是对其中的小部分进行分析，小部分足以展示其难度和运行机理。boost源码给我的感觉对基础知识要求很高，是对知识正确的运用（我们的朋友们已经走向了另一条路，喜马拉雅上还是要从中国这方爬比较合适）。lambda源码对模板技术的运用很高，比其它代码如pool，shared_ptr等等都要厉害。总体来看mpl源码是元编...">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/css/detail_enter-667d0b7e43.min.css">  
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/release/blogv2/dist/pc/themesSkin/skin3-template/skin3-template-c298f9ecea.min.css">     
+  <link rel="stylesheet" type="text/css" href="https://csdnimg.cn/public/sandalstrap/1.4/css/sandalstrap.min.css"> 
+  <style>
+        .MathJax, .MathJax_Message, .MathJax_Preview{
+            display: none
+        }
+    </style>  
+ </head> 
+ <body class="nodata " style="">    
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/pc/css/blog_code-01256533b5.min.css"> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/chart-3456820cac.css"> 
+  <div class="main_father clearfix d-flex justify-content-center" style="height:100%;"> 
+   <div class="container clearfix" id="mainBox"> 
+    <main style="width:100%">  
+     <div class="blog-content-box"> 
+      <div class="article-header-box"> 
+       <div class="article-header"> 
+        <div class="article-title-box"> 
+         <h1 class="title-article" id="articleContentId">(三)boost::lambda源码分析</h1> 
+        </div> 
+        <div class="article-info-box"> 
+         <div class="article-bar-top"> 
+          <img class="article-type-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/original.png" alt=""> 
+          <div class="bar-content"> 
+           <a class="follow-nickName " href="https://blog.csdn.net/yshuise" target="_blank" rel="noopener">yshuise</a> 
+           <span class="time">2010-10-03 11:32:00</span> 
+           <img class="article-read-img article-heard-img" src="https://csdnimg.cn/release/blogv2/dist/pc/img/articleReadEyes.png" alt=""> 
+           <span class="read-count">4678</span> 
+           <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollect.png" alt=""> <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="https://csdnimg.cn/release/blogv2/dist/pc/img/tobarCollectionActive.png" alt=""> <span class="name">收藏</span> <span class="get-collection"> 1 </span> </a> 
+          </div> 
+         </div> 
+         <div class="blog-tags-box"> 
+          <div class="tags-box artic-tag-box"> 
+           <span class="label">分类专栏：</span> 
+           <a class="tag-link" href="https://blog.csdn.net/yshuise/category_271590.html" target="_blank" rel="noopener">C++&amp;amp;&amp;amp;算法&amp;amp;&amp;amp;设计模式</a> 
+           <span class="label">文章标签：</span> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;lambda&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=lambda&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">lambda</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;tuples&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=tuples&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">tuples</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;functor&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=functor&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">functor</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;null&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=null&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">null</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;action&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=action&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">action</a> 
+           <a data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;class&quot;,&quot;ab&quot;:&quot;new&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=class&amp;t=blog&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank" rel="noopener">class</a> 
+          </div> 
+         </div> 
+         <div class="slide-content-box"> 
+          <div class="article-copyright"> 
+           <div class="creativecommons">
+             版权声明：本文为博主原创文章，遵循
+            <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。 
+           </div> 
+           <div class="article-source-link">
+             本文链接：
+            <a href="https://blog.csdn.net/yshuise/article/details/5919585" target="_blank">https://blog.csdn.net/yshuise/article/details/5919585</a> 
+           </div> 
+          </div> 
+         </div> 
+         <div class="operating"> 
+          <a class="href-article-edit slide-toggle">版权</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div id="blogColumnPayAdvert"> 
+       <div class="column-group"> 
+        <div class="column-group-item column-group0 column-group-item-one"> 
+         <div class="item-l"> 
+          <a class="item-target" href="https://blog.csdn.net/yshuise/category_271590.html" target="_blank" title="C++&amp;&amp;算法&amp;&amp;设计模式" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.6332&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.6332&quot;}"> <img class="item-target" src="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt=""> <span class="title item-target">C++&amp;&amp;算法&amp;&amp;设计模式</span> </a> 
+          <span class="dec">专栏收录该内容</span> 
+         </div> 
+         <div class="item-m"> 
+          <span>81 篇文章</span> 
+          <span>1 订阅</span> 
+         </div> 
+         <div class="item-r"> 
+          <a class="item-target article-column-bt articleColumnFreeBt" data-id="271590">订阅专栏</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <article class="baidu_pl"> 
+       <div id="article_content" class="article_content clearfix"> 
+        <link rel="stylesheet" href="https://csdnimg.cn/release/blogv2/dist/mdeditor/css/editerView/ck_htmledit_views-d7093e7f7c.css"> 
+        <div id="content_views" class="htmledit_views"> 
+         <p>&nbsp;本文是lambda分析篇最重要的一篇。lambda源码比较庞大（把宏全部展开），只是对其中的小部分进行分析，小部分足以展示其难度和运行机理。</p> 
+         <p>boost源码给我的感觉对基础知识要求很高，是对知识正确的运用（我们的朋友们已经走向了另一条路，喜马拉雅上还是要从中国这方爬比较合适）。lambda源码对模板技术的运用很高，比其它代码如pool，shared_ptr等等都要厉害。总体来看mpl源码是元编程的皎皎者，但是很难运用在实际的工作中。lambda应该是实际运用的出色者。</p> 
+         <p></p> 
+         <p>先看下面的代码：</p> 
+         <pre class="has"><code class="language-cpp">#include "stdafx.h" 
+#include &lt;iostream&gt; 
+#include &lt;vector&gt; 
+#include &lt;algorithm&gt;
+#include &lt;string&gt; 
+#include "boost/lambda/lambda.hpp"
+#include "boost/tuple/tuple.hpp" 
+//#include "boost/lambda/bind.hpp" // Tuple to cons mapper -------------------------------------------------- 
+int _tmain(int argc, _TCHAR* argv[]) 
+{ 
+using namespace boost::lambda; 
+using namespace std;
+ boost::tuple&lt;int,double,string&gt; triple(42, 3.245, "The amazing tuple!"); 
+int a0 = triple.get&lt;0&gt;(); 
+double a1 = triple.get&lt;1&gt;();
+ string a2 = triple.get&lt;2&gt;(); 
+std::vector&lt;int&gt; vec(3);
+ vec[0] = 12; 
+vec[1] = 10; 
+vec[2] = 7;
+ //Transform using a lambda expression 
+std::for_each(vec.begin(), vec.end(), std::cout&lt;&lt;_1);
+ std::for_each(vec.begin(), vec.end(), std::cout&lt;&lt;_1&lt;&lt;' '); 
+//std::transform(vec.begin(), vec.end(), vec.begin(), _1-= 4); return 0; }</code></pre> 
+         <p>首先，主要研究lambda的运用：</p> 
+         <p>std::for_each(vec.begin(), vec.end(), std::cout&lt;&lt;_1);</p> 
+         <p>打印出容器中的元素，这些元素显然是连续的。如果要分开，可以写成：</p> 
+         <p>std::cout&lt;&lt;_1&lt;&lt;' ' 或是std::cout&lt;&lt;_1&lt;&lt;std::endl;</p> 
+         <p>简单的增加了后面的' '或是std::endl将使模板参数变得异常的复杂。</p> 
+         <p>因此，先考虑不那么复杂的语句:</p> 
+         <p>std::cout&lt;&lt;_1</p> 
+         <p>上面语句一定先要展开_1,这个在源码中被定义成这样的形式：</p> 
+         <pre class="has"><code>boost::lambda::placeholder1_type&amp; _1 = free1;
+boost::lambda::placeholder1_type free1 = boost::lambda::placeholder1_type();
+typedef const lambda_functor&lt;placeholder&lt;FIRST&gt; &gt; placeholder1_type; 
+template &lt;int I&gt; struct placeholder; 
+template&lt;&gt; struct placeholder&lt;FIRST&gt;
+{ 
+template&lt;class SigArgs&gt; struct sig
+{ 
+typedef typename detail::get_element_or_null_type&lt;0, SigArgs&gt;::type type; 
+};
+ template&lt;class RET, CALL_TEMPLATE_ARGS&gt; RET call(CALL_FORMAL_ARGS) const
+{ //这儿主要还是在于返回a 
+BOOST_STATIC_ASSERT(boost::is_reference&lt;RET&gt;::value); 
+CALL_USE_ARGS; // does nothing, prevents warnings for unused args return a;
+}
+};</code></pre> 
+         <p>上面要获得lambda_fuctor这个模板，它是由宏扩展而成：</p> 
+         <pre class="has"><code>BOOST_LAMBDA_BE2(operator&lt;&lt;,
+ bitwise_action&lt; leftshift_action&gt;, A, const B,
+ detail::convert_ostream_to_ref_others_to_c_plain_by_default)</code></pre> 
+         <p>上面这个流程先讨论到这儿。实际上由于这个流程指向的方向是非常复杂，只有充满勇气人才能人继续走下去。</p> 
+         <p>前面讨论到：</p> 
+         <p>std::cout&lt;&lt;_1</p> 
+         <p>由于这个for_each:</p> 
+         <p>template &lt;class _InputIter, class _Function&gt; _Function for_each(_InputIter __first, _InputIter __last, _Function __f) { __STL_REQUIRES(_InputIter, _InputIterator); for ( ; __first != __last; ++__first) __f(*__first); //std::cout&lt;&lt;_1(*first); return __f; }</p> 
+         <p>所以实际上std::cout&lt;&lt;_1应该是这样的形式：</p> 
+         <p>std::cout&lt;&lt;_1(*first);</p> 
+         <p>根据重载操作符的&lt;&lt;的规则，第一个参数必是std::cout,那么这个</p> 
+         <p>函看起来是这个样子：</p> 
+         <p>std::cout&lt;&lt; lambda_functor&lt;placeholder&lt;FIRST&gt; &gt;(*first); 上面语句调用的函数看起来向下面这个样子： operator &lt;&lt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt;&amp; )</p> 
+         <p></p> 
+         <p>上面的operator&lt;&lt;从何而来？</p> 
+         <pre class="has"><code>#define BOOST_LAMBDA_BE2(OPER_NAME, ACTION, CONSTA, CONSTB, CONVERSION) / 
+template&lt;class A, class Arg&gt; / 
+inline const / 
+lambda_functor&lt; / 
+lambda_functor_base&lt; / 
+ACTION, /
+ tuple&lt;typename CONVERSION &lt;CONSTA&gt;::type, lambda_functor&lt;Arg&gt; &gt; /
+ &gt; /
+ &gt; /
+ OPER_NAME (CONSTA&amp; a, const lambda_functor&lt;Arg&gt;&amp; b) { /
+ return /
+ lambda_functor_base&lt; /
+ ACTION, /
+ tuple&lt;typename CONVERSION &lt;CONSTA&gt;::type, lambda_functor&lt;Arg&gt; &gt; /
+ &gt; /
+ (tuple&lt;typename CONVERSION &lt;CONSTA&gt;::type, lambda_functor&lt;Arg&gt; &gt;(a, b)); /
+ }</code></pre> 
+         <p>由此语句展开：</p> 
+         <p>BOOST_LAMBDA_BE2(operator&lt;&lt;, bitwise_action&lt; leftshift_action&gt;, A, const B, detail::convert_ostream_to_ref_others_to_c_plain_by_default)</p> 
+         <p>展开过后为：</p> 
+         <pre class="has"><code>//上面的宏扩展成下面这个样子 
+template&lt;class A, class Arg&gt; 
+inline const lambda_functor&lt; 
+lambda_functor_base&lt; bitwise_action&lt; leftshift_action&gt;, tuple&lt;typename detail::convert_ostream_to_ref_others_to_c_plain_by_default&lt;A&gt;::type, 
+lambda_functor&lt;Arg&gt; &gt; &gt; &gt; operator&lt;&lt; (A&amp; a, const lambda_functor&lt;Arg&gt;&amp; b){
+//operator&lt;&lt;是重载操作符,std::cout&lt;&lt;_1,std::cout对应第一个参数，_1对应第二参数。
+ return lambda_functor_base&lt; 
+bitwise_action&lt; leftshift_action&gt;, 
+tuple&lt;typename detail::convert_ostream_to_ref_others_to_c_plain_by_default&lt;A&gt;::type,
+ lambda_functor&lt;Arg&gt; &gt; &gt; (tuple&lt;typename
+ detail::convert_ostream_to_ref_others_to_c_plain_by_default&lt;A&gt;::type, lambda_functor&lt;Arg&gt; &gt;(a, b));
+ }</code></pre> 
+         <p></p> 
+         <p>这个函数同相对应：</p> 
+         <p>operator &lt;&lt;(std::basic_ostream&lt;char, std::char_traits&lt;char&gt; &gt;&amp;, boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt;&amp; )</p> 
+         <p>也就是：</p> 
+         <p>A --------------------&gt; std::basic_ostream&lt;char,std::char_traits&lt;char&gt; &gt;</p> 
+         <p>boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt; ------&gt; const lambda_functor&lt;Arg&gt;&amp;</p> 
+         <p>而返回类型是：</p> 
+         <p>const boost::tuples::tuple&lt;std::basic_ostream&lt;char,std::char_traits&lt;char&gt; &gt; &amp;,boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt;,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type&gt; &amp;</p> 
+         <p>为什么返回类型如此重要，因为如果后面还有输出内容，那么不能少。std::cout&lt;&lt;_1&lt;&lt;'&nbsp; '，输出</p> 
+         <p>' '少不了返回类型。</p> 
+         <p>convert_ostream_to_ref_others_to_c_plain_by_default这个元函数类不讨论了。它的主要内容在</p> 
+         <p>（一）boost::lambda分析中已经讨论了。</p> 
+         <p>这样最终构造一个lambda_functor对象。</p> 
+         <p>然后在for_each中，调用</p> 
+         <p>template &lt;class _InputIter, class _Function&gt; _Function for_each(_InputIter __first, _InputIter __last, _Function __f) { __STL_REQUIRES(_InputIter, _InputIterator); for ( ; __first != __last; ++__first) __f(*__first); //这句就是调用lambda_functor(*_first),因为lambda_functor对operator()进行了重载，所以最终是对operator()的调用。 return __f; }</p> 
+         <p>lambda_functor调用如下：</p> 
+         <pre class="has"><code>template &lt;class T&gt; class lambda_functor : public T { 
+public: typedef T inherited;
+ lambda_functor() {} 
+lambda_functor(const lambda_functor&amp; l) : inherited(l) {}
+ lambda_functor(const T&amp; t) : inherited(t) {}
+ template &lt;class SigArgs&gt; 
+struct sig {
+ typedef typename inherited::template sig&lt;typename SigArgs::tail_type&gt;::type type;
+ }; // Note that this return type deduction template is instantiated, even // if the nullary // operator() is not called at all. One must make sure that it does not fail. typedef typename inherited::template sig&lt;null_type&gt;::type nullary_return_type; nullary_return_type operator()() const { 
+return inherited::template call&lt;nullary_return_type&gt; (cnull_type(), cnull_type(), cnull_type(), cnull_type()); 
+} //对这个operator进行调用 template&lt;class A&gt; typename inherited::template sig&lt;tuple&lt;A&amp;&gt; &gt;::type operator()(A&amp; a) const {
+ return inherited::template call&lt; typename inherited::template sig&lt;tuple&lt;A&amp;&gt; &gt;::type &gt;(a, cnull_type(), cnull_type(), cnull_type());
+ } </code></pre> 
+         <p>................. ................ ...........</p> 
+         <p>上面的operator()中的call调用实际上:</p> 
+         <p></p> 
+         <pre class="has"><code>template&lt;class Args&gt; class lambda_functor_base&lt;bitwise_action&lt;leftshift_action&gt;, Args&gt;{ public: 
+Args args; 
+public: explicit lambda_functor_base(const Args&amp; a):args(a){} 
+template&lt;class RET, class A, class B, class C, class Env&gt; RET 
+call(A&amp; a, B&amp; b, C&amp; c, Env&amp; env)const{ 
+//这儿快到终点了。get&lt;0&gt;(args)参数这儿代表std::cout; 
+//get&lt;1&gt;(args)代表12，所以就像这样std::cout&lt;&lt;12 return detail::select(boost::tuples::get&lt;0&gt;(args), a, b, c, env) &lt;&lt; detail::select(boost::tuples::get&lt;1&gt;(args), a, b, c, env); 
+}
+ template&lt;class SigArgs&gt; struct sig{ 
+typedef typename detail::binary_rt&lt;bitwise_action&lt;leftshift_action&gt;, Args, SigArgs&gt;::type type; 
+};
+ };</code></pre> 
+         <p>std::cout&lt;&lt;_1与std::cout&lt;&lt;_1&lt;&lt;' '差别在哪儿？在于传入的args这个模板参数不同。</p> 
+         <p>std::cout&lt;&lt;_1的模板参数类型是：</p> 
+         <pre class="has"><code>const boost::tuples::tuple&lt;std::basic_ostream&lt;char,std::char_traits&lt;char&gt; &gt; &amp;, boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt;, boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type&gt; &amp;&nbsp;</code></pre> 
+         <p>而std::cout&lt;&lt;_1&lt;&lt;' '的类型是：</p> 
+         <pre class="has"><code>const boost::tuples::tuple&lt;boost::lambda::lambda_functor&lt; boost::lambda::lambda_functor_base&lt; boost::lambda::bitwise_action&lt;boost::lambda::leftshift_action&gt;, boost::tuples::tuple&lt;std::basic_ostream&lt;char,std::char_traits&lt;char&gt; &gt; &amp;, boost::lambda::lambda_functor&lt;boost::lambda::placeholder&lt;1&gt; &gt;, boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type&gt; &gt; &gt;,char const , boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type,boost::tuples::null_type, boost::tuples::null_type,boost::tuples::null_type&gt; &amp;</code></pre> 
+         <p>可见要复杂得多。里面的boost::tuples::null_type可以略去不看。</p> 
+         <p>如果仔细的阅读，还是可以理解的。不理解是不行的，只有理解了才能懂得其道理。</p> 
+         <p>通过模板的递归调用最终还是std::cout&lt;&lt;_1&lt;&lt;' '这种形式。</p> 
+         <p>这只是冰山一角，已足以展示其复杂性。</p> 
+         <p></p> 
+         <p></p> 
+         <p></p> 
+         <p></p> 
+        </div> 
+       </div> 
+       <div id="treeSkill"></div> 
+      </article>  
+      <img src="https://img-home.csdnimg.cn/images/20211209110851.png" alt="pdf_watermark" width="0" height="0" style="display: none"> 
+      <div class="print_watermark"></div> 
+      <div class="print_watermark_info"> 
+       <p>内容来源：csdn.net</p> 
+       <p>作者昵称：yshuise</p> 
+       <p>原文链接：https://blog.csdn.net/yshuise/article/details/5919585</p> 
+       <p>作者主页：https://blog.csdn.net/yshuiseyshuise</p> 
+      </div> 
+      <style>
+    .print_watermark, .print_watermark_info {
+      display: none
+    }
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact;
+      }
+      .blog-content-box {
+        padding: 0;
+      }
+      .blog-content-box .article-header .article-info-box > div:not(.article-bar-top){
+        display: none !important;
+      }
+      .blog-content-box .article-header .article-info-box  .article-bar-top img{
+          display:none
+      }
+      .blog-content-box .article-header .article-info-box > .article-bar-top .bar-content > *:not(.follow-nickName):not(.time){
+          display: none !important;
+      }
+      .print_watermark {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 999;
+        background-image: url('https://img-home.csdnimg.cn/images/20211209110851.png');
+        background-size: 180px auto;
+        background-repeat: repeat;
+      }
+      .print_watermark_info {
+        display: block;
+        position: fixed;
+        bottom: 16px;
+        right: 0;
+        z-index: 1000;
+        color: #e8e8ed;
+        font-size: 12px;
+        ocapity: .5
+      }
+      @page {
+        margin: 0 10mm 10mm;
+        size: landscape;
+      }
+      body, article {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #csdn-toolbar,.main_father > *:not(#mainBox), .csdn-side-toolbar, .main_father aside {
+        display: none !important;
+      }
+      .main_father > #mainBox {
+        width: unset
+      }
+      .main_father > #mainBox > main > *:not(.blog-content-box){
+        display: none !important;
+      }
+    }
+  </style> 
+     </div> 
+     <div class="more-toolbox-new" id="toolBarBox"> 
+      <div class="left-toolbox"> 
+       <div class="toolbox-left"> 
+        <div class="profile-box">
+         <a class="profile-href" target="_blank" href="https://blog.csdn.net/yshuise"><img class="profile-img" src="https://profile.csdnimg.cn/3/5/0/3_yshuise"><span class="profile-name">yshuise</span></a>
+        </div> 
+        <div class="profile-attend"> 
+         <a class="tool-attend tool-bt-button tool-bt-attend" href="javascript:;" data-report-view="{&quot;mod&quot;:&quot;1592215036_002&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;extend1&quot;:&quot;关注&quot;}">关注</a> 
+         <a class="tool-item-follow active-animation" style="display:none;">关注</a> 
+        </div> 
+       </div> 
+       <div class="toolbox-middle">  
+       </div> 
+       <div class="toolbox-right"> 
+        <div class="tool-directory"> 
+         <a class="bt-columnlist-show" data-id="271590" data-free="true" data-subscribe="false" data-title="C++&amp;&amp;算法&amp;&amp;设计模式" data-img="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" data-url="https://blog.csdn.net/yshuise/category_271590.html" data-sum="81" data-people="1" data-price="0" data-oldprice="0" data-join="false" data-studyvip="false" data-studysubscribe="false" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.6334&quot;,&quot;extend1&quot;:&quot;专栏目录&quot;}">专栏目录</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div>        
+     <a id="commentBox" name="commentBox"></a>       
+    </main>     
+   </div> 
+   <div class="recommend-right  align-items-stretch clearfix" id="rightAside" data-type="recommend"> 
+    <aside class="recommend-right_aside"> 
+     <div id="recommend-right"> 
+      <div class="flex-column aside-box groupfile" id="groupfile"> 
+       <div class="groupfile-div"> 
+        <h3 class="aside-title">目录</h3> 
+        <div class="align-items-stretch group_item"> 
+         <div class="pos-box"> 
+          <div class="scroll-box"> 
+           <div class="toc-box"></div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="aside-box kind_person d-flex flex-column"> 
+       <h3 class="aside-title">分类专栏</h3> 
+       <div class="align-items-stretch kindof_item" id="kind_person_column"> 
+        <div class="aside-content"> 
+         <ul> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_11572161.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_11572161.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756928.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">笔记</span> </span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_271590.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_271590.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756926.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">C++&amp;&amp;算法&amp;&amp;设计模式</span> </span> <span class="count float-right">81篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_472156.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_472156.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756757.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">社会、经济、哲学、军事、战略等等</span> </span> <span class="count float-right">30篇</span> </a> </li> 
+          <li class=""> <a class="clearfix" target="_blank" href="https://blog.csdn.net/yshuise/category_275433.html" data-report-click="{&quot;mod&quot;:&quot;popu_537&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4137&quot;,&quot;strategy&quot;:&quot;pc付费专栏左侧入口&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise/category_275433.html&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://img-blog.csdnimg.cn/20201014180756916.png?x-oss-process=image/resize,m_fixed,h_64,w_64" alt="" onerror="this.src='https://img-blog.csdnimg.cn/20201014180756922.png?x-oss-process=image/resize,m_fixed,h_64,w_64'"> <span class="title oneline"> <span class="text">资料</span> </span> <span class="count float-right">34篇</span> </a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </aside> 
+   </div> 
+  </div> 
+  <div class="mask-dark"></div>   
+  <div class="skin-boxshadow"></div> 
+  <div class="directory-boxshadow"></div> 
+  <div id="rewardNew" class="reward-popupbox-new"> 
+   <p class="rewad-title">打赏作者<span class="reward-close"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/closeBt.png"></span></p> 
+   <dl class="profile-box"> 
+    <dd> 
+     <a href="https://blog.csdn.net/yshuise" data-report-click="{&quot;mod&quot;:&quot;popu_379&quot;,&quot;dest&quot;:&quot;https://blog.csdn.net/yshuise&quot;,&quot;ab&quot;:&quot;new&quot;}"> <img src="https://profile.csdnimg.cn/3/5/0/3_yshuise" class="avatar_pic"> </a> 
+    </dd> 
+    <dt> 
+     <p class="blog-name">yshuise</p> 
+     <p class="blog-discript">权术横行</p> 
+    </dt> 
+   </dl> 
+   <div class="reward-box-new"> 
+    <div class="reward-content">
+     <div class="reward-right"></div>
+    </div> 
+   </div> 
+   <div class="money-box"> 
+    <span class="choose-money choosed" data-id="2">¥2</span> 
+    <span class="choose-money " data-id="4">¥4</span> 
+    <span class="choose-money " data-id="6">¥6</span> 
+    <span class="choose-money " data-id="10">¥10</span> 
+    <span class="choose-money " data-id="20">¥20</span> 
+    <input id="customizeMoney" class="customize-money" name="" type="" value="" placeholder="自定义"> 
+    <div class="customize-tip">
+     输入1-500的整数
+    </div> 
+   </div> 
+   <div class="pay-box"> 
+    <div class="pay-type-blance pay-type active" data-type="blance"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">余额支付</span> 
+     <span class="pay-type-num">(余额：-- )</span> 
+    </div> 
+    <div class="pay-type-money pay-type" data-type="money"> 
+     <img class="unchoose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newUnChoose.png" alt=""> 
+     <img class="choose" src="https://csdnimg.cn/release/blogv2/dist/pc/img/newChoose.png" alt=""> 
+     <span class="pay-type-name">扫码支付</span> 
+    </div> 
+   </div> 
+   <div class="sure-box"> 
+    <div class="sure-box-money"> 
+     <div class="code-box"> 
+      <div class="code-num-box"> 
+       <span class="code-name">扫码支付：</span>
+       <span class="code-num">¥2</span> 
+      </div> 
+      <div class="code-img-box"> 
+       <div class="renovate"> 
+        <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+        <span>获取中</span> 
+       </div> 
+      </div> 
+      <div class="code-pay-box"> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newWeiXin.png" alt=""> 
+       <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/newZhiFuBao.png" alt=""> 
+       <span>扫码支付</span> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="sure-box-blance"> 
+     <p class="tip">您的余额不足，请更换扫码支付或<a target="_blank" data-report-click="{&quot;mod&quot;:&quot;1597646289_003&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4302&quot;}" href="https://i.csdn.net/#/wallet/balance/recharge?utm_source=RewardVip" class="go-invest">充值</a></p> 
+     <p class="is-have-money"><a class="reward-sure">打赏作者</a></p> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="pay-code"> 
+   <div class="pay-money">
+    实付
+    <span class="pay-money-span" data-nowprice="" data-oldprice="">元</span>
+   </div> 
+   <div class="content-blance">
+    <a class="blance-bt" href="javascript:;">使用余额支付</a>
+   </div> 
+   <div class="content-code"> 
+    <div id="payCode" data-id=""> 
+     <div class="renovate"> 
+      <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-time-out.png"> 
+      <span>点击重新获取</span> 
+     </div> 
+    </div> 
+    <div class="pay-style">
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/weixin.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/zhifubao.png"></span>
+     <span><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/jingdong.png"></span>
+     <span class="text">扫码支付</span>
+    </div> 
+   </div> 
+   <div class="bt-close">
+    <svg t="1567152543821" class="icon" viewbox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10924" xmlns:xlink="http://www.w3.org/1999/xlink" width="12" height="12">
+     <defs>
+      <style type="text/css"></style>
+     </defs>
+     <path d="M512 438.378667L806.506667 143.893333a52.032 52.032 0 1 1 73.6 73.621334L585.621333 512l294.485334 294.485333a52.074667 52.074667 0 0 1-73.6 73.642667L512 585.621333 217.514667 880.128a52.053333 52.053333 0 1 1-73.621334-73.642667L438.378667 512 143.893333 217.514667a52.053333 52.053333 0 1 1 73.621334-73.621334L512 438.378667z" fill="" p-id="10925"></path>
+    </svg>
+   </div> 
+   <!-- <p style="margin-top: 8px;font-size: 14px;" class="text-center">支付成功即可阅读</p> --> 
+   <div class="pay-balance"> 
+    <input type="radio" class="pay-code-radio" data-type="details"> 
+    <span class="span">钱包余额</span> 
+    <span class="balance" style="color:#FC5531;font-size:14px;">0</span> 
+    <div class="pay-code-tile"> 
+     <img src="https://csdnimg.cn/release/blogv2/dist/pc/img/pay-help.png" alt=""> 
+     <div class="pay-code-content"> 
+      <div class="span"> 
+       <p class="title">抵扣说明：</p> 
+       <p> 1.余额是钱包充值的虚拟货币，按照1:1的比例进行支付金额的抵扣。<br> 2.余额无法直接购买下载，可以购买VIP、C币套餐、付费专栏及课程。</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <a class="pay-balance-con" href="https://i.csdn.net/#/wallet/balance/recharge" target="_blank"><img src="https://csdnimg.cn/release/blogv2/dist/pc/img/recharge.png" alt=""><span>余额充值</span></a> 
+  </div> 
+  <div style="display:none;">  
+  </div>  
+  <!-- 富文本柱状图  --> 
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/chart/chart.css">      
+  <link rel="stylesheet" href="https://csdnimg.cn/release/blog_editor_html/release1.6.12/ckeditor/plugins/codesnippet/lib/highlight/styles/atom-one-light.css">                  
+ </body>
+</html>
