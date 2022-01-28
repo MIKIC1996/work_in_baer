@@ -62,6 +62,41 @@ void unique_lock_test() {
 
 
 //读写锁
+/*
+C++14提供了shared_mutex来解决读者 - 写者问题，也就是读写锁，和普通锁不一样，读写锁同时只能有一个写者或多个读者，但不能同时既有读者又有写者，读写锁的性能一般比普通锁要好。
+shared_mutex通过lock_shared，unlock_shared，shared_lock进行读者的锁定与解锁；通过lock，unlock，unique_lock进行写者的锁定与解锁。
+*/
+
+
+
+class ThreadSafeCounter {
+public:
+	ThreadSafeCounter() = default;
+
+	// 多个线程/读者能同时读计数器的值。
+	unsigned int get() const {
+		std::shared_lock<std::shared_mutex> lock(mutex_);
+		return value_;
+	}
+
+	// 只有一个线程/写者能增加/写线程的值。
+	void increment() {
+		std::unique_lock<std::shared_mutex> lock(mutex_);
+		value_++;
+	}
+
+	// 只有一个线程/写者能重置/写线程的值。
+	void reset() {
+		std::unique_lock<std::shared_mutex> lock(mutex_);
+		value_ = 0;
+	}
+
+private:
+	mutable std::shared_mutex mutex_;
+	unsigned int value_ = 0;
+};
+
+
 
 void readWriteLockTest() {
 

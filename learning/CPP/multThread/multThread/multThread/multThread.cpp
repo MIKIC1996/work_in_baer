@@ -13,7 +13,10 @@ int main()
 	//unique_lock_test();
 	//recursive_lock_test();
 	//condition_vari_test();
-	readWriteLockTest();
+	//readWriteLockTest();
+	//async_task();
+	//promise_test();
+	mult_promise_test();
 	getchar();
 
 

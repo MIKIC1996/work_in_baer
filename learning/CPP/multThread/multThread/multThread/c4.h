@@ -61,3 +61,75 @@ void condition_vari_test() {
 	t1.join(); //连接线程，等待退出
 
 }
+
+
+//期望
+//使用期望获取异步任务的返回值
+
+int getAnswer() {
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	return 100;
+}
+
+
+void async_task() {
+
+	std::future<int> ret = std::async(getAnswer); //提交了一个异步任务
+	std::cout << ret.get() <<std::endl;
+
+}
+
+
+
+
+
+
+
+//std::promise 是C++11并发编程中常用的一个类，常配合std::future使用。其作用是在一个线程t1中保存一个
+//类型typename T的值，可供相绑定的std::future对象在另一线程t2中获取。
+
+std::promise<int>  promise1;
+
+void set_promise_val() {
+
+	try {
+
+		//throw std::logic_error("logic");
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		promise1.set_value(100);
+		
+	}
+	catch (...) {
+		promise1.set_exception(std::current_exception()); //可以接收异常
+	}
+}
+
+
+void promise_test() {
+
+	std::thread t1(set_promise_val);
+
+	std::future<int> fu = promise1.get_future();//也可以得到异常
+
+	int ret = fu.get();//阻塞等待
+	std::cout << ret << std::endl;
+
+	t1.join();
+}
+
+
+//多个线程同时等待一个future
+void mult_promise_test() {
+
+	std::shared_future<int> sf = promise1.get_future().share();
+	std::shared_future <int> sf2 = sf;
+
+
+	std::thread t1(set_promise_val);
+
+	std::thread t2([&sf] { std::cout << sf.get()<< std::endl;  });
+	std::thread t3([&sf2]{ std::cout << sf2.get()<< std::endl;  });
+	t1.join();
+	t2.join();
+	t3.join();
+}
