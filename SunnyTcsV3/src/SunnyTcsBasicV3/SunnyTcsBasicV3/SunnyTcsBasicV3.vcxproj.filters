@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="Header Files\general">
+      <UniqueIdentifier>{254c7057-9a25-4d8d-bbc5-cc7647bcfd06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logic">
+      <UniqueIdentifier>{1bde9eda-d5c6-47a4-b68f-9579967d355b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logic">
+      <UniqueIdentifier>{3f3f298f-6a6d-4d66-b405-e8f5664a36ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\general">
+      <UniqueIdentifier>{dc26a3e5-b902-403d-beec-05f7a68f7308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\algorithm">
+      <UniqueIdentifier>{a7c16fba-2d5f-429d-89ab-ffdc3f4c21ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\business">
+      <UniqueIdentifier>{18a9f7f0-408a-4d36-ab37-95e47bcc0eee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\business">
+      <UniqueIdentifier>{84ed1dce-6b26-46b4-91df-061b1b199085}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\error">
+      <UniqueIdentifier>{084ce825-eda6-4793-babd-4194b940e31c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\error">
+      <UniqueIdentifier>{6e2ecbf4-ee3a-460f-b080-adcd5572982b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\integra">
+      <UniqueIdentifier>{7479069c-b2ea-4baa-9b16-717db21c5ecc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\integra">
+      <UniqueIdentifier>{fb8443f8-7f3d-439b-9e1e-9f64b01e2803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DB">
+      <UniqueIdentifier>{06347d04-1787-472a-a87e-989dd265fd34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DB">
+      <UniqueIdentifier>{67cbeea4-c4ca-4cd2-8287-2e841ee7da6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\map_interface">
+      <UniqueIdentifier>{3d49a385-4906-47eb-b11c-9de36aa93386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\map_interface">
+      <UniqueIdentifier>{a86b7cba-a95f-4987-bf8f-8beb6bf0a1b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\map">
+      <UniqueIdentifier>{9dede908-486c-4b5c-be39-5e50f674a48f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\map">
+      <UniqueIdentifier>{fee53c8f-4a13-423c-9871-8a2823bde936}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sunnytcsbasicv3_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsBasicV3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsFuncGeneral.hpp">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsGeneralArg.hpp">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLogicGeneral.hpp">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsSingleCondition.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsPreciseCondition.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsVagueCondition.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLibGeneral.hpp">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapActualData.hpp">
+      <Filter>Header Files\map_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsGeneralAlgorithm.hpp">
+      <Filter>Header Files\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLogicParser.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapGeneral.hpp">
+      <Filter>Header Files\map_interface</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsAction.h">
+      <Filter>Header Files\business</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsCraft.h">
+      <Filter>Header Files\business</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsUIDWorker.h">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLogicInfo.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsErrorCenter.h">
+      <Filter>Header Files\error</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMessage.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMessageLibrary.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMessageGeneral.hpp">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsDbGeneral.hpp">
+      <Filter>Header Files\DB</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsPoint.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsCoorSys.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsPath.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsVehicle.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLocation.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsModel.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsPromise.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsVehicleLib.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SunnyTcsSingleCondition.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsPreciseCondition.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsVagueCondition.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsAction.cpp">
+      <Filter>Source Files\business</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsCraft.cpp">
+      <Filter>Source Files\business</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsUIDWorker.cpp">
+      <Filter>Source Files\general</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLogicInfo.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsErrorCenter.cpp">
+      <Filter>Source Files\error</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMessage.cpp">
+      <Filter>Source Files\integra</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMessageLibrary.cpp">
+      <Filter>Source Files\integra</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsPoint.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsCoorSys.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsPath.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsVehicle.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLocation.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsModel.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsVehicleLib.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLogicGeneral.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLogicParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="Header Files\map">
+      <UniqueIdentifier>{b8720183-f95b-4eaf-904a-7d4732a448cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\map">
+      <UniqueIdentifier>{f6a66036-c4bc-4c3c-a1f8-c4d070ab5824}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\thread">
+      <UniqueIdentifier>{93e8e787-6ff1-429e-a606-1a1f392e8108}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\thread">
+      <UniqueIdentifier>{3c1305a4-011d-4bf5-8dc5-06ef22e96e8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\integra">
+      <UniqueIdentifier>{f102fa7a-fafd-496c-b42c-c17f24eaadd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\integra">
+      <UniqueIdentifier>{a07e31ba-9738-4d49-bced-8d6ee56ed914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logger">
+      <UniqueIdentifier>{3a6a64fe-d07e-4474-a7d8-ab11112bbba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\logic">
+      <UniqueIdentifier>{40b55d8a-6224-442f-91a9-7cbfebd5fdd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logic">
+      <UniqueIdentifier>{4e4c95da-27eb-4178-8a47-137ec0e4eaa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dispatch">
+      <UniqueIdentifier>{6a706071-3f11-4187-a26f-25e914493186}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dispatch">
+      <UniqueIdentifier>{e4e65411-5e60-48c2-9c77-9385bf53cc80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\orderCenter">
+      <UniqueIdentifier>{e252f293-34dd-43a6-80d9-dcfbedf64d52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\orderCenter">
+      <UniqueIdentifier>{6c2b76fe-0a85-4468-8ad0-59c3dae5743e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\logger">
+      <UniqueIdentifier>{48471df6-3912-45b1-9981-fef275763b87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\projects">
+      <UniqueIdentifier>{0fbba045-7094-4cdf-9890-a781e1642431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\projects\normal">
+      <UniqueIdentifier>{0a1c398d-a405-4015-85da-86c0268ad393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projects">
+      <UniqueIdentifier>{4ff1f6f6-654d-48f2-bc4e-0503df4dbd45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projects\normal">
+      <UniqueIdentifier>{01c2254f-83c8-4ad1-8f8f-25150159c298}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sunnytcscorev3_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClCompile Include="SunnyTcsCoreV3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClInclude Include="SunnyTcsMapCoorSys.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsCoreV3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsThreadCenter.h">
+      <Filter>Header Files\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsOrderCenter.h">
+      <Filter>Header Files\orderCenter</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMessageCenter.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="I_SunnyTcsMsgSender.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="I_SunnyTcsLogger.h">
+      <Filter>Header Files\logger</Filter>
+    </ClInclude>
+    <ClInclude Include="I_SunnyTcsRunner.h">
+      <Filter>Header Files\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsCoreLogicParser.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapPoint.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapPath.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapModel.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapVehicle.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsLineVariable.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsDispatcher.h">
+      <Filter>Header Files\dispatch</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsAgvFactory.h">
+      <Filter>Header Files\map</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsDispatchAlgorithmFactory.h">
+      <Filter>Header Files\dispatch</Filter>
+    </ClInclude>
+    <ClInclude Include="I_SunnyTcsCraftAgency.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsCoreCraftAgency.h">
+      <Filter>Header Files\integra</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapVehicle_normal.h">
+      <Filter>Header Files\projects\normal</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsMapModel_normal.h">
+      <Filter>Header Files\projects\normal</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SunnyTcsMapCoorSys.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsThreadCenter.cpp">
+      <Filter>Source Files\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsOrderCenter.cpp">
+      <Filter>Source Files\orderCenter</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMessageCenter.cpp">
+      <Filter>Source Files\integra</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsCoreLogicParser.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapPoint.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapPath.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapModel.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapVehicle.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLineVariable.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsDispatcher.cpp">
+      <Filter>Source Files\dispatch</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsAgvFactory.cpp">
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsDispatchAlgorithmFactory.cpp">
+      <Filter>Source Files\dispatch</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsCoreCraftAgency.cpp">
+      <Filter>Source Files\integra</Filter>
+    </ClCompile>
+    <ClCompile Include="I_SunnyTcsLogger.cpp">
+      <Filter>Source Files\logger</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapVehicle_normal.cpp">
+      <Filter>Source Files\projects\normal</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsMapModel_normal.cpp">
+      <Filter>Source Files\projects\normal</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+#pragma once
+
+#include "sunnytcsbasicv3_global.h"
+
+//3.0 系统
+#define INTEGRA_V3_NODE_ID_KERNEL 1 //内核
+#define INTEGRA_V3_NODE_ID_COMMUNICATION_BUS 2 //通讯总线
+#define INTEGRA_V3_NODE_ID_DATACENTER 3 //数据中心
+
+
+//兼容2.0 系统
+#define INTEGRA_V2_NODE_ID_BROKER 0
+#define INTEGRA_V2_NODE_ID_KERNEL 1
+#define INTEGRA_V2_NODE_ID_DATACENTER 2
+#define INTEGRA_V2_NODE_ID_COMMUNICATION_CENTER 3
+#define INTEGRA_V2_NODE_ID_LOG_CENTER 4
+
+
+//消息ID
+

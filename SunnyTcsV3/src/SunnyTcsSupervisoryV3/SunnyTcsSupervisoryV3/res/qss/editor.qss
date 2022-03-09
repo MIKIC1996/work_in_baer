@@ -1,0 +1,166 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 颜色层次，从暗到明  ， 由底向上 ：rgb(60,70,100)（底色）  rgb(80, 90, 120)(内嵌窗口色) rgb(85, 95, 125)窗口内嵌部件色  */
+
+
+/*底色*/
+#centralWidget{
+	background-color:rgb(60,70,100);
+}
+
+QMainWindow::separator{
+
+	background-color:rgb(60,70,100);
+	width:4px;
+	height:4px;
+
+}
+
+/*
+#SunnyTcsMapEditor{
+	border-image:url(:/resource/res/image/back1.jpg);
+}
+*/
+
+
+
+
+/*中色*/
+QStatusBar{
+	background:rgb(70, 80, 110);
+	color:rgb(255,255,255);
+}
+
+QMenuBar{
+	background:rgb(80, 90, 120);
+	color:rgb(255,255,255);
+}
+
+QToolBar{
+	spacing:8px;
+	background:rgb(80, 90, 120);
+	border: 15px;
+}
+
+QToolBar::separator{
+	background-color:rgbs(100, 100, 130,0);
+}
+
+
+#SunnyTcsMapEditor{
+	background-color:rgb(80, 90, 120);
+}
+
+QDockWidget{
+	background:rgb(80, 90, 120);
+	color:rgb(255,255,255);
+}
+
+
+QToolButton{
+	background:rgb(80, 90, 120);
+	color:rgv(255,255,255);
+}
+
+
+/*明色*/
+QGraphicsView{
+	background-color:rgb(80, 90, 120);
+	border-color:rgb(80, 90, 120);
+	border: 0px;
+}
+
+
+
+QTreeWidget{
+	background:rgb(90, 100, 130);
+	color:rgb(255,255,255);
+	border-color:rgb(90, 100, 130);
+	border: 3px;
+}
+
+
+QTableWidget{
+	background:rgb(90, 100, 130);
+	color:rgb(255,255,255);
+	border-color:rgb(90, 100, 130);
+	border: 3px;
+}
+
+
+
+QHeaderView::section{
+	background-color:rgb(90, 100, 130);
+	color:rgb(255,255,255);
+}
+
+
+
+QListWidget{
+	background:rgb(90, 100, 130);
+	color:rgb(255,255,255);
+	border-color:rgb(90, 100, 130);
+	border: 3px;
+}
+
+
+QLineEdit{
+	background:rgb(90, 100, 130);
+	color:rgb(255,255,255);
+	border-color:rgb(90, 100, 130);
+	border: 3px;
+}
+
+
+QScrollBar{
+	background:rgb(100,110,140);
+	border-color:rgb(80,90,120);
+	color:rgb(80,90,120);
+	border:0px;
+}
+
+
+QScrollBar::add-page,QScrollBar::sub-page
+{
+	background-color:rgb(80,90,120);
+	border-color:rgb(80,90,120);
+	color:rgb(80,90,120);
+	border:0px;
+}
+
+
+/*
+QScrollBar::handle
+{
+	background:rgb(100,110,140);
+	border-color:rgb(60,70,100);
+	border:3px;
+}
+*/
+
+QLabel{
+	color:rgb(255,255,255);
+}
+
+
+
+
+
+
+
+
+
+
