@@ -10,7 +10,7 @@
  	1 fd
 	2 cmd[
 		F_DUPFD  F_DUPFD_CLOEXEC        copy the file fd
-		F_GETFD				get file fs
+		F_GETFD				get file fd
 		F_SETFD				set file fd
 		F_GETFL				get file statues
 		F_SETFL 			set file statues
