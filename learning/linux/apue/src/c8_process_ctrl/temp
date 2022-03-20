@@ -1,0 +1,2 @@
+before forkglo = 7 , val =4 ,pid = 0
+before forkglo = 6 , val =3 ,pid = 2693
