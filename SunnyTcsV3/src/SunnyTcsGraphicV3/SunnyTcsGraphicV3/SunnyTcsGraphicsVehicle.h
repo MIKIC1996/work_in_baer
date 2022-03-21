@@ -29,17 +29,30 @@ public:
 	//assignment
 	SunnyTcsGraphicsVehicle& operator=(const SunnyTcsGraphicsVehicle&) = delete;
 
-	//自己的纯虚函数
-	virtual bool updateGraphicsData(const QByteArray & data) = 0; 
+	//getter
+	qreal getLadarRadius()const { return _ladarRadius; }
+	//setter
+	void setLadarRadius(qreal val) { _ladarRadius = val; }
 
 	// 通过 SunnyTcsMapGraphicItem 继承
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = Q_NULLPTR) override;
-	virtual SunnyTcsMapObject_tag getItemTag() const override =0;
-	virtual SunnyTcsAgvCode getVehicleCode()const = 0;
 	virtual QPainterPath shape()const override;
 
+	//自己的纯虚函数
+	virtual bool updateGraphicsData(const QByteArray & data) = 0; 
 	
+	virtual SunnyTcsMapObject_tag getItemTag() const override =0;
+	virtual SunnyTcsAgvCode getVehicleCode()const = 0;
+
+	virtual QString getVehicleIp()const = 0;
+	virtual void setVehicleIp(QString ip) = 0;
+
+	virtual quint16 getVehiclePort()const = 0;
+	virtual void setVehiclePort(quint16 port) = 0;
+
+	virtual bool fromVehicleJson(QJsonObject& jobj) { return false; }
+	virtual QJsonObject toVehicleJson()const { return QJsonObject(); }
 
 protected:
 	const SunnyTcsGraphicsCoorSys* _cs;

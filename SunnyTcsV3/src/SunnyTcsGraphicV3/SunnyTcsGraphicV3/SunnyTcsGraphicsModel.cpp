@@ -72,6 +72,16 @@ QList<SunnyTcsGraphicsVehicle*> SunnyTcsGraphicsModel::selectedVehicleItems()
 	return ret;
 }
 
+SunnyTcsAgvCoordinate SunnyTcsGraphicsModel::transformRealityToScene(const SunnyTcsAgvCoordinate & rxy)
+{
+	return _cs->transformToScene(rxy);
+}
+
+SunnyTcsAgvCoordinate SunnyTcsGraphicsModel::transformSceneToReality(const SunnyTcsAgvCoordinate & sxy)
+{
+	return _cs->transformToReality(sxy);
+}
+
 
 void SunnyTcsGraphicsModel::setWidAndHei(qint32 wid, qint32 hei)
 {
@@ -185,8 +195,12 @@ SunnyTcsGraphicsPath*  SunnyTcsGraphicsModel::updateTempPath(QPointF pt, bool is
 				this->removeItem(end);
 				delete end; //原来使用的temp end点就没用了
 				end = tempEnd;
+				_pathTemp->setIsEndNew(false); //设置直线终点是否为新点
 			}
-			_pathTemp->setIsEndNew(tempEnd ? false : true); //设置直线终点是否为新点
+			else {
+				_pathTemp->setIsEndNew(true); //设置直线终点是否为新点
+			}
+			
 			end->setZValue(GRAPHICS_POINT_ZVALUE);
 
 			_pts.insert(start->getElementId(), start);
@@ -332,6 +346,8 @@ void SunnyTcsGraphicsModel::addSelectAera(SunnyTcsGraphicsSelectAera::selectAera
 	addItem(_aera);
 }
 
+
+
 void SunnyTcsGraphicsModel::updateSelectAera(QPointF pt, bool isEnd)
 {
 	if (!_aera)return;
@@ -348,6 +364,82 @@ void SunnyTcsGraphicsModel::updateSelectAera(QPointF pt, bool isEnd)
 	}
 	update();
 }
+
+const QHash<qint32, SunnyTcsMapGroups*>& SunnyTcsGraphicsModel::getGroup(E_SunnyTcsMapObject_type type) const
+{
+	switch (type)
+	{
+	case basic::Epoint:
+		return _ptGroups;
+	case basic::Epath:
+		return _phGroups;
+	case basic::Elocation:
+		return _locGroups;
+	case basic::Evehicle:
+		return _veGroups;
+	default:
+		Q_ASSERT(0);
+	}
+	return _ptGroups;
+}
+
+void SunnyTcsGraphicsModel::addItemGroup(E_SunnyTcsMapObject_type type, QString name)
+{
+	SunnyTcsMapGroups* gp = new SunnyTcsMapGroups(this, name);
+	if (name.isEmpty()) {
+		switch (type)
+		{
+		case basic::Epoint:
+			name = QString("point group %1").arg(gp->getId());
+			_ptGroups.insert(gp->getId(), gp);
+			break;
+		case basic::Epath:
+			name = QString("path group %1").arg(gp->getId());
+			_phGroups.insert(gp->getId(), gp);
+			break;
+		case basic::Elocation:
+			name = QString("location group %1").arg(gp->getId());
+			_locGroups.insert(gp->getId(), gp);
+			break;
+		case basic::Evehicle:
+			name = QString("agv group %1").arg(gp->getId());
+			_veGroups.insert(gp->getId(), gp);
+			break;
+		default:
+			delete gp;
+			return;
+		}
+	}
+	
+}
+
+void SunnyTcsGraphicsModel::removeItemGroup(E_SunnyTcsMapObject_type type, qint32 id)
+{
+	QHash<qint32, SunnyTcsMapGroups*> *groupPtr = nullptr;
+	switch (type)
+	{
+	case basic::Epoint:
+		groupPtr = &_ptGroups;
+		break;
+	case basic::Epath:
+		groupPtr = &_phGroups;
+		break;
+	case basic::Elocation:
+		groupPtr = &_locGroups;
+		break;
+	case basic::Evehicle:
+		groupPtr = &_veGroups;
+		break;
+	default:
+		Q_ASSERT(0);
+		break;
+	}
+	if (groupPtr->contains(id)) {
+		groupPtr->remove(id);
+	}
+}
+
+
 
 SunnyTcsGraphicsPoint* SunnyTcsGraphicsModel::addGraphicsPoint(QPointF pt)
 {
@@ -416,6 +508,28 @@ SunnyTcsGraphicsVehicle* SunnyTcsGraphicsModel::addGraphicsVehicle(QPointF pt, S
 	return ve;
 }
 
+
+
+bool SunnyTcsGraphicsModel::addGraphicsItems(SunnyTcsMapGraphicItem * item)
+{
+	if (!item) {
+		return false;
+	}
+	switch (item->getItemTag()._eletype)
+	{
+	case basic::Epoint:
+		return addGraphicsPoint(dynamic_cast<SunnyTcsGraphicsPoint*>(item));
+	case basic::Epath:
+		return addGraphicsPath(dynamic_cast<SunnyTcsGraphicsPath*>(item));
+	case basic::Elocation:
+		return addGraphicsLocation(dynamic_cast<SunnyTcsGraphicsLocation*>(item));
+	case basic::Evehicle:
+		return addGraphicsVehicle(dynamic_cast<SunnyTcsGraphicsVehicle*>(item));
+	default:
+		return false;
+	}
+}
+
 bool SunnyTcsGraphicsModel::addGraphicsPoint(SunnyTcsGraphicsPoint * item)
 {
 	if (_pts.contains(item->getItemId()))return false;
@@ -423,6 +537,8 @@ bool SunnyTcsGraphicsModel::addGraphicsPoint(SunnyTcsGraphicsPoint * item)
 	this->addItem(item);
 	return true;
 }
+
+
 
 bool SunnyTcsGraphicsModel::addGraphicsPath(SunnyTcsGraphicsPath * item)
 {
@@ -432,6 +548,8 @@ bool SunnyTcsGraphicsModel::addGraphicsPath(SunnyTcsGraphicsPath * item)
 	return true;
 }
 
+
+
 bool SunnyTcsGraphicsModel::addGraphicsLocation(SunnyTcsGraphicsLocation * item)
 {
 	if (_locs.contains(item->getItemId()))return false;
@@ -439,6 +557,8 @@ bool SunnyTcsGraphicsModel::addGraphicsLocation(SunnyTcsGraphicsLocation * item)
 	this->addItem(item);
 	return true;
 }
+
+
 
 bool SunnyTcsGraphicsModel::addGraphicsVehicle(SunnyTcsGraphicsVehicle * item)
 {
@@ -494,6 +614,7 @@ bool SunnyTcsGraphicsModel::deleteGraphicsPath(SunnyTcsGraphicsPath * item)
 }
 
 
+
 bool SunnyTcsGraphicsModel::deleteGraphicsLocation(SunnyTcsGraphicsLocation * item)
 {
 	if (removeGraphicsLocation(item)) {
@@ -503,6 +624,8 @@ bool SunnyTcsGraphicsModel::deleteGraphicsLocation(SunnyTcsGraphicsLocation * it
 	return false;
 }
 
+
+
 bool SunnyTcsGraphicsModel::deleteGraphicsVehicle(SunnyTcsGraphicsVehicle * item)
 {
 	if (removeGraphicsVehicle(item)) {
@@ -511,6 +634,30 @@ bool SunnyTcsGraphicsModel::deleteGraphicsVehicle(SunnyTcsGraphicsVehicle * item
 	}
 	return false;
 }
+
+
+
+bool SunnyTcsGraphicsModel::remiveGraphicsItems(SunnyTcsMapGraphicItem * item)
+{
+	if (!item) {
+		return false;
+	}
+	switch (item->getItemTag()._eletype)
+	{
+	case basic::Epoint:
+		return removeGraphicsPoint(dynamic_cast<SunnyTcsGraphicsPoint*>(item));
+	case basic::Epath:
+		return removeGraphicsPath(dynamic_cast<SunnyTcsGraphicsPath*>(item));
+	case basic::Elocation:
+		return removeGraphicsLocation(dynamic_cast<SunnyTcsGraphicsLocation*>(item));
+	case basic::Evehicle:
+		return removeGraphicsVehicle(dynamic_cast<SunnyTcsGraphicsVehicle*>(item));
+	default:
+		return false;
+	}
+}
+
+
 
 bool SunnyTcsGraphicsModel::removeGraphicsPoint(SunnyTcsMapGraphicItem * item)
 {
@@ -663,6 +810,7 @@ void SunnyTcsGraphicsModel::drawBackground(QPainter * painter, const QRectF & re
 	}
 }
 
+
 // QPainterPath SunnyTcsGraphicsSelectAera::shape() const
 // {
 // 	QPainterPath path;
@@ -678,6 +826,7 @@ void SunnyTcsGraphicsModel::drawBackground(QPainter * painter, const QRectF & re
 // 	}
 // 	return path;
 // }
+
 
 QRectF SunnyTcsGraphicsSelectAera::boundingRect() const
 {

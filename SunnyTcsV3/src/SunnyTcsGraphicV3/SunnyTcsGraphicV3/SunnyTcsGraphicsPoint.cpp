@@ -25,7 +25,8 @@ SunnyTcsGraphicsPoint::SunnyTcsGraphicsPoint( const SunnyTcsGraphicsCoorSys * cs
 
 SunnyTcsAgvCoordinate SunnyTcsGraphicsPoint::getSceneXy() const
 {
-	return _cs->transformToScene(_rxy);
+	//return _cs->transformToScene(_rxy);
+	return SunnyTcsAgvCoordinate(E_TWO_DIMENSION, this->pos().x(), this->pos().y());
 }
 
 
@@ -35,6 +36,15 @@ void SunnyTcsGraphicsPoint::updateData()
 	this->_rxy._x = ret._x;
 	this->_rxy._y = ret._y;
 }
+
+
+void SunnyTcsGraphicsPoint::setPointRealityXy(SunnyTcsAgvCoordinate coor)
+{
+	_rxy = coor;
+	SunnyTcsAgvCoordinate& sxy = _cs->transformToScene(_rxy);
+	this->setPos(sxy._x, sxy._y);
+}
+
 
 QRectF SunnyTcsGraphicsPoint::boundingRect() const
 {

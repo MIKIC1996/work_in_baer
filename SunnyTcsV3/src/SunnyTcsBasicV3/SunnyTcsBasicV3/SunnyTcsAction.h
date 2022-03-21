@@ -71,8 +71,6 @@ namespace   basic {
 
 
 
-
-
 	template<typename _Tuple,typename _Ty,int _index = std::tuple_size<_Tuple>::value -1>
 	struct initTuple {
 		static void init(_Tuple& t, _Ty val) {
@@ -82,6 +80,7 @@ namespace   basic {
 		}
 	};
 
+
 	template<typename _Tuple, typename _Ty>
 	struct initTuple<_Tuple,_Ty,0> {
 		static void init(_Tuple& t, _Ty val) {
@@ -89,15 +88,18 @@ namespace   basic {
 		}
 	};
 
+
+
 	//指令接口,考虑到了泛用性，接口的设计很难确定
 	class A_SunnyTcsCommand {
 
-	};
+	}; 
 
 	//指令
 	class SUNNYTCSBASICV3_EXPORT SunnyTcsAction:public A_SunnyTcsCommand
 	{
 	public:
+		//default
 		SunnyTcsAction()
 			:A_SunnyTcsCommand(), _commandId(0), _commandCode(),
 			_params(), _paramType(ARG_INT32), _isInOrder(true),
@@ -106,7 +108,7 @@ namespace   basic {
 			Tuple_for_each<TupleInit_int32_f, SunnyTcsParamsSet>::for_each(_params);
 		}
 
-		
+		//ctor
 		explicit SunnyTcsAction(E_ARG_TYPE type) 
 			:A_SunnyTcsCommand(), _commandId(0), _commandCode(),
 			_params(), _paramType(type), _isInOrder(true),
@@ -114,13 +116,13 @@ namespace   basic {
 		{
 			initTuple<SunnyTcsParamsSet, SunnyTcsArg>::init(_params, SunnyTcsArg(type));
 		}
-
+		//copy ctor
 		SunnyTcsAction(const SunnyTcsAction&) = default;
-
+		//operator =
 		SunnyTcsAction& operator=(const SunnyTcsAction&) = default;
-
+		//detor
 		virtual ~SunnyTcsAction() {}
-
+		//operator ==
 		bool operator==(const SunnyTcsAction& rhs) const {
 			bool ok = true;
 			do {
@@ -186,10 +188,6 @@ namespace   basic {
 		}
 
 		QString toString()const;
-
-		
-
-
 
 	protected:
 		qint16 _commandId; //指令ID

@@ -45,6 +45,27 @@ SunnyTcsAgvCode SunnyTcsGraphicsVehicle_normal::getVehicleCode() const
 }
 
 
+QString SunnyTcsGraphicsVehicle_normal::getVehicleIp() const
+{
+	return _ip;
+}
+
+void SunnyTcsGraphicsVehicle_normal::setVehicleIp(QString ip)
+{
+	_ip = ip;
+}
+
+quint16 SunnyTcsGraphicsVehicle_normal::getVehiclePort() const
+{
+	return _port;
+}
+
+void SunnyTcsGraphicsVehicle_normal::setVehiclePort(quint16 port)
+{
+	_port = port;
+}
+
+
 //---------------------------------------
 
 
@@ -89,6 +110,26 @@ bool SunnyTcsGraphicsVehicle_mitsubishi_battery::updateGraphicsData(const QByteA
 SunnyTcsAgvCode SunnyTcsGraphicsVehicle_mitsubishi_battery::getVehicleCode() const
 {
 	return _code;
+}
+
+QString SunnyTcsGraphicsVehicle_mitsubishi_battery::getVehicleIp() const
+{
+	return _ip;
+}
+
+void SunnyTcsGraphicsVehicle_mitsubishi_battery::setVehicleIp(QString ip)
+{
+	_ip = ip;
+}
+
+quint16 SunnyTcsGraphicsVehicle_mitsubishi_battery::getVehiclePort() const
+{
+	return _port;
+}
+
+void SunnyTcsGraphicsVehicle_mitsubishi_battery::setVehiclePort(quint16 port)
+{
+	_port = port;
 }
 
 
@@ -137,4 +178,24 @@ bool SunnyTcsGraphicsVehicle_daimler_engine::updateGraphicsData(const QByteArray
 SunnyTcsAgvCode SunnyTcsGraphicsVehicle_daimler_engine::getVehicleCode() const
 {
 	return _code;
+}
+
+QString SunnyTcsGraphicsVehicle_daimler_engine::getVehicleIp() const
+{
+	return _ip;
+}
+
+void SunnyTcsGraphicsVehicle_daimler_engine::setVehicleIp(QString ip)
+{
+	_ip = ip;
+}
+
+quint16 SunnyTcsGraphicsVehicle_daimler_engine::getVehiclePort() const
+{
+	return _port;
+}
+
+void SunnyTcsGraphicsVehicle_daimler_engine::setVehiclePort(quint16 port)
+{
+	_port = port;
 }

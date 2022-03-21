@@ -93,11 +93,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="SunnyTcsSupervisoryV3.qrc" />
+    <QtUic Include="SunnyTcsLocationEditWidget.ui" />
     <QtUic Include="SunnyTcsMapEditor.ui" />
     <QtUic Include="SunnyTcsSupervisoryV3.ui" />
     <QtMoc Include="SunnyTcsSupervisoryV3.h" />
+    <ClCompile Include="SunnyTcsActionTableWidget.cpp" />
     <ClCompile Include="SunnyTcsDockWidget.cpp" />
     <ClCompile Include="SunnyTcsGraphicsView.cpp" />
+    <ClCompile Include="SunnyTcsLocationEditWidget.cpp" />
     <ClCompile Include="SunnyTcsMapEditor.cpp" />
     <ClCompile Include="SunnyTcsSupervisoryV3.cpp" />
     <ClCompile Include="main.cpp" />
@@ -106,6 +109,8 @@
     <QtMoc Include="SunnyTcsGraphicsView.h" />
     <QtMoc Include="SunnyTcsMapEditor.h" />
     <QtMoc Include="SunnyTcsDockWidget.h" />
+    <QtMoc Include="SunnyTcsLocationEditWidget.h" />
+    <QtMoc Include="SunnyTcsActionTableWidget.h" />
     <ClInclude Include="SunnyTcsSupervisoryV3_general.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

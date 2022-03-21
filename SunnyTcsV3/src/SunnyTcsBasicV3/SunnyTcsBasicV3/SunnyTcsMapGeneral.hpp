@@ -48,6 +48,15 @@ namespace basic {
 			return !this->operator==(rhs);
 		}
 
+		bool operator<(const SunnyTcsMapObject_tag& rhs)const {
+			if (_eletype != rhs._eletype) {
+				return (qint32)(_eletype) < (qint32)(rhs._eletype);
+			}
+			else {
+				return _id < rhs._id;
+			}
+		}
+
 		bool isNull()const {
 			return _eletype == Enotype;
 		}

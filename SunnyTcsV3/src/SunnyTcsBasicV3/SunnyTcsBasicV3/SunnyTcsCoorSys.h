@@ -31,6 +31,10 @@ namespace basic {
 
 		virtual SunnyTcsAgvCoordinate transformToReality(SunnyTcsAgvCoordinate scene) const override;
 
+		//×ÔÉíÐéº¯Êý
+		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual QJsonObject toJson()const { return QJsonObject(); }
+
 	};
 
 

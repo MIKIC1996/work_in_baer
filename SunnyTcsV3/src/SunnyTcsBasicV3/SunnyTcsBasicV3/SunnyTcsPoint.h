@@ -22,6 +22,9 @@ namespace basic {
 		virtual QVector<SunnyTcsMapBlock> getBlocks(qint32 resolution) const override;
 		virtual bool isInRange(SunnyTcsAgvCoordinate coor) const override;
 
+		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual QJsonObject toJson()const { return QJsonObject(); }
+
 	protected:
 		const SunnyTcsCoorSys* _cs;
 	};

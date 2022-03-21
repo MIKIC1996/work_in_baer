@@ -35,6 +35,9 @@ namespace basic {
 		void setWidth(qint32 wid) { _wid = wid; }
 		void setResolution(qint32 res) { _resolution = res; }
 
+		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual QJsonObject toJson()const { return QJsonObject(); }
+
 	protected:
 		quint64 _modelId; //模型id,每个子类都有专属的id号，通常一个项目一个
 		qint32 _wid;  //宽

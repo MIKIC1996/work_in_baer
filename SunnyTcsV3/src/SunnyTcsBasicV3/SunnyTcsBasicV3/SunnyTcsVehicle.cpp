@@ -8,9 +8,9 @@ namespace basic {
 
 
 	SunnyTcsVehicle::SunnyTcsVehicle(SunnyTcsAgvCode code, qint32 id)
-		:I_SunnyTcsAgvStat(code,id)
+		:I_SunnyTcsAgvStat(code,id),_ip("127.0.0.1"),_port(4000)
 	{
-		
+		_connectId = connectionID(_ip, _port);
 	}
 
 	SunnyTcsArg SunnyTcsVehicle::getAttribution(QString key, bool & ok) const

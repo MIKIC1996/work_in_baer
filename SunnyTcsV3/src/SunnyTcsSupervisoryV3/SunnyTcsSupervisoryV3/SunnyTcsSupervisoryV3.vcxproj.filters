@@ -21,6 +21,24 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Header Files\mapEditor">
+      <UniqueIdentifier>{d4f848c6-e72c-4b59-91a5-5a3528e2cdc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mapEditor">
+      <UniqueIdentifier>{34788365-a72e-45c2-98c5-a32d513330f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\general">
+      <UniqueIdentifier>{044f7e62-7088-4a83-bc1b-8da0329a3469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\general">
+      <UniqueIdentifier>{d94e39fd-2ba0-4845-b64a-ac21cc5b9fba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\schedulePanel">
+      <UniqueIdentifier>{d23f2c67-8ae3-421a-a396-7c113942a822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\schedulePanel">
+      <UniqueIdentifier>{2e0fabba-adfc-4c91-b873-e70cbab50e38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="SunnyTcsSupervisoryV3.qrc">
@@ -29,46 +47,61 @@
     <QtUic Include="SunnyTcsSupervisoryV3.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="SunnyTcsSupervisoryV3.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="SunnyTcsSupervisoryV3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SunnyTcsGraphicsView.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SunnyTcsDockWidget.cpp">
+      <Filter>Source Files\mapEditor</Filter>
     </ClCompile>
     <ClCompile Include="SunnyTcsMapEditor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\mapEditor</Filter>
     </ClCompile>
-    <ClCompile Include="SunnyTcsDockWidget.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SunnyTcsGraphicsView.cpp">
+      <Filter>Source Files\general</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsSupervisoryV3.cpp">
+      <Filter>Source Files\schedulePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsLocationEditWidget.cpp">
+      <Filter>Source Files\general</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsActionTableWidget.cpp">
+      <Filter>Source Files\general</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="SunnyTcsGraphicsView.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="SunnyTcsMapEditor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\mapEditor</Filter>
     </QtMoc>
     <QtMoc Include="SunnyTcsDockWidget.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\mapEditor</Filter>
     </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="SunnyTcsSupervisoryV3_general.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <QtMoc Include="SunnyTcsGraphicsView.h">
+      <Filter>Header Files\general</Filter>
+    </QtMoc>
+    <QtMoc Include="SunnyTcsSupervisoryV3.h">
+      <Filter>Header Files\schedulePanel</Filter>
+    </QtMoc>
+    <QtMoc Include="SunnyTcsLocationEditWidget.h">
+      <Filter>Header Files\general</Filter>
+    </QtMoc>
+    <QtMoc Include="SunnyTcsActionTableWidget.h">
+      <Filter>Header Files\general</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="SunnyTcsMapEditor.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="SunnyTcsLocationEditWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SunnyTcsSupervisoryV3_general.h">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

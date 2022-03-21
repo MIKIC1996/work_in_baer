@@ -13,7 +13,14 @@
 #include <QComboBox>
 #include <QStack>
 #include <SunnyTcsGraphicV3.h>
-
+#include <QTableWidget>
+#include <QScrollBar>
+#include <QCheckBox>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QMessageBox>
+#include <QHeaderView>
 
 
 //用户操作接口,用以支持撤销与重做功能

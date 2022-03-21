@@ -44,5 +44,17 @@
         <file>res/image/selectOn.png</file>
         <file>res/image/mapLocationIcon.png</file>
         <file>res/image/mapLocationIconSelected.png</file>
+        <file>res/image/coorSysMove.png</file>
+        <file>res/image/coorSysMoveSelected.png</file>
+        <file>res/image/mapLocationIcon2.png</file>
+        <file>res/image/mapLocationIcon2Selected.png</file>
+        <file>res/image/cancelSelect.png</file>
+        <file>res/image/cancelSelectOn.png</file>
+        <file>res/image/redo.png</file>
+        <file>res/image/undo.png</file>
+        <file>res/image/cancelSel.png</file>
+        <file>res/image/selectAll.png</file>
+        <file>res/image/MapEditorIcon.png</file>
+        <file>res/image/ulsDeviceOn.png</file>
     </qresource>
 </RCC>

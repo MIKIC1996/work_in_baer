@@ -59,26 +59,73 @@ namespace basic {
 	};
 
 	
+
+	class I_SunnyTcsElementData;
+	//某个组的接口
+	class I_SunnyTcsGroup {
+	public:
+		friend class I_SunnyTcsElementData;
+	public:
+		I_SunnyTcsGroup(qint32 id, QString name) :_id(id), _name(name) ,_members(){}
+		virtual ~I_SunnyTcsGroup() {}
+
+		qint32 getId()const { return _id; }
+		QString getName()const { return _name; }
+		const QHash<qint32, I_SunnyTcsElementData*>& getMembers()const { return _members; }
+
+	protected:
+		//以下是供I_SunnyTcsElementData内部调用的
+		virtual void registerGroup(I_SunnyTcsElementData*) = 0;
+		virtual void dropRegister(qint32 id) = 0;
+		
+	protected:
+		qint32 _id;
+		QString _name;
+		QHash<qint32, I_SunnyTcsElementData*> _members;
+	};
+
+
+
+
 	//地图元素数据接口,接口设计尽量设计 接口纯虚函数就行，除非是显而易见的实现！
 	class I_SunnyTcsElementData {
 	public:
+		friend class I_SunnyTcsGroup;
+	public:
 		//ctor
-		explicit I_SunnyTcsElementData(qint32 id) :_id(id) {}
+		explicit I_SunnyTcsElementData(qint32 id , I_SunnyTcsGroup* group = nullptr) :_id(id),_group(group) {
+			if (_group) {
+				_group->registerGroup(this);
+			}
+		}
+
 		//dtor
-		virtual ~I_SunnyTcsElementData() {}
+		virtual ~I_SunnyTcsElementData() {
+			if (_group) {
+				_group->dropRegister(this->getElementId());
+			}
+		}
+
 		//getter 
 		inline qint32 getElementId() const { return _id; }
+
+		I_SunnyTcsGroup* getGroup()const { return _group; }
+
 		//setter
 		void setElementId(qint32 id) { _id = id; }
 
-		//interface
-		//锁
-		virtual void lock() {} //设计这三个锁接口，是为了应付不可避免的多线程访问问题，多线程的实现交由开发者自己完成
-		virtual void unlock() {}
-		virtual bool tryLock() { return false; }
-		virtual std::shared_mutex* getSharedLock() { return nullptr; }//获取读写锁
+		//重新设置组
+		void registerNewGroup(I_SunnyTcsGroup* newGroup) {
+			if (_group) {
+				_group->dropRegister(this->getElementId());
+			}
+			if (newGroup) {
+				newGroup->registerGroup(this);
+			}
+			_group = newGroup;
+		}
 
-		
+		//interface		
 		virtual SunnyTcsMapObject_tag getTag()const = 0;
 		virtual SunnyTcsArg getAttribution(QString key,bool& ok)const = 0;//设计该接口是为了满足 非标项目垃圾客户的多样性需求
 		virtual bool setAttribution(QString key, SunnyTcsArg arg) = 0;
@@ -87,6 +134,7 @@ namespace basic {
 		virtual bool isInRange(SunnyTcsAgvCoordinate coor)const { return false; }
 	protected:
 		qint32 _id;
+		I_SunnyTcsGroup* _group;
 	};
 
 
@@ -94,16 +142,17 @@ namespace basic {
 	//这个是车辆的特化接口,使用读写锁保障线程安全
 	class I_SunnyTcsAgvStat : public I_SunnyTcsElementData {
 	public:
+		//ctor
 		I_SunnyTcsAgvStat(SunnyTcsAgvCode code, qint32 id)
 			: I_SunnyTcsElementData(id), _code(code),
 			_coor(code._dim, 0, 0, 0), _pos(),
 			_status(EOutLine),_orderBinded(0),_lift(0),_error(0),_warning(0),_lock()
 		{}
-
+		//copy ctor
 		I_SunnyTcsAgvStat(const I_SunnyTcsAgvStat&) = delete;
-
+		//detor
 		virtual ~I_SunnyTcsAgvStat(){}
-
+		//operator=
 		I_SunnyTcsAgvStat& operator=(const I_SunnyTcsAgvStat&) = delete;
 
 		//getter
@@ -179,16 +228,14 @@ namespace basic {
 	//坐标系接口
 	class I_SunnyTcsCoorSys :public I_SunnyTcsElementData {
 	public:
-
 		//ctor
 		explicit I_SunnyTcsCoorSys(qint32 id = 0) :I_SunnyTcsElementData(id),
-			_rxy(E_TWO_DIMENSION, 0, 0, 0), _xpos(Eright), _ypos(Eup), _lock()
-		{}
+			_rxy(E_TWO_DIMENSION, 0, 0, 0), _xpos(Eright), _ypos(Eup), _lock(){}
 		//copy ctor
 		I_SunnyTcsCoorSys(const I_SunnyTcsCoorSys& rhs) = delete;
 		//dtor
 		virtual ~I_SunnyTcsCoorSys() {}
-		//assignment
+		//operator=
 		I_SunnyTcsCoorSys& operator=(const I_SunnyTcsCoorSys&) = delete;
 
 		//getter
@@ -245,15 +292,16 @@ namespace basic {
 	//点的实时数据,线程安全
 	class I_SunnyTcsVertex : public I_SunnyTcsElementData {
 	public:
+		//ctor
 		explicit I_SunnyTcsVertex(qint32 id =0)
 			:I_SunnyTcsElementData(id), _absPos(0),
 			_rxy(E_TWO_DIMENSION, 0, 0, 0), _nagaMode(0),
 			_lockOwner(0), _usedCount(0), _lock() {}
-
+		//copy ctor
 		I_SunnyTcsVertex(const I_SunnyTcsVertex&) = delete;
-
+		//detor
 		virtual ~I_SunnyTcsVertex() {}
-
+		//operator=
 		I_SunnyTcsVertex& operator=(const I_SunnyTcsVertex&) = delete;
 
 		//getter
@@ -302,19 +350,21 @@ namespace basic {
 	//边数据，线程安全
 	class I_SunnyTcsEdge : public I_SunnyTcsElementData {
 	public:
+		//ctor
 		explicit I_SunnyTcsEdge(qint32 id=0)
-			:I_SunnyTcsElementData(id),_isDoubleDirection(true), _isScanAeraActived(false),
+			:I_SunnyTcsElementData(id),_isSupportPositive(true),_isSupportNegative(false), _isScanAeraActived(false),
 			_positiveSpeed(300),_negativeSpeed(300),
 			_positiveScanAera(0),_negativeScanAera(0),_lockOwner(0),_lock(){}
-
+		//copy ctor
 		I_SunnyTcsEdge(const I_SunnyTcsEdge&) = delete;
-
+		//detor
 		virtual ~I_SunnyTcsEdge() {}
-
+		//operator=
 		I_SunnyTcsEdge& operator=(const I_SunnyTcsEdge&) = delete;
 
 		//getter
-		inline bool isDoubleDirection()const { return _isDoubleDirection; }//是否双向支持
+		inline bool isSupportPositive() const { return _isSupportPositive; }
+		inline bool isSupportNegative() const { return _isSupportNegative; }
 		inline qint32 getPositiveSpeed()const { return _positiveSpeed; }//正向速度
 		inline qint32 getNegativeSpeed()const { return _negativeSpeed; }//反向速度，如果有的话
 		inline bool isScanAeraActived()const { return _isScanAeraActived; }//是否激活扫描区
@@ -329,7 +379,8 @@ namespace basic {
 		}
 		
 		//setter
-		void setIfDoubleDirection(bool is) { _isDoubleDirection = is; }
+		void setIsSupportPositive(bool is) { _isSupportPositive = is; }
+		void setIsSupportNegative(bool is) { _isSupportNegative = is; }
 		void setPositiveSpeed(qint32 sp) { _positiveSpeed = sp; }
 		void setNegativeSpeed(qint32 sp) { _negativeSpeed = sp; }
 		void setIfScanAeraActived(bool is) { _isScanAeraActived = is; }
@@ -353,7 +404,8 @@ namespace basic {
 		virtual bool setAttribution(QString key, SunnyTcsArg arg) override = 0;//设置属性接口
 
 	protected:
-		bool _isDoubleDirection;
+		bool _isSupportPositive;
+		bool _isSupportNegative;
 		bool _isScanAeraActived;
 		qint32 _positiveSpeed;//本段的默认限速
 		qint32 _negativeSpeed; //支持反向的化，反向速度
@@ -465,15 +517,12 @@ namespace basic {
 			return nullptr;
 		}
 
-
 		//得到某agv当前的状态	
 		virtual I_SunnyTcsAgvStat* getAgvStat(qint32 id, bool& ok) {
 			QHash<qint32, I_SunnyTcsAgvStat*> agvs;
 			this->agvStats(agvs);
 			return agvs.keys().contains(id) ? agvs[id] : nullptr;
 		}
-
-
 
 		//根据from 和 to 找出合适的路径
 		virtual I_SunnyTcsEdge* getEdgeByFromAndTo(qint32 from, qint32 to, bool& ok) {
@@ -487,8 +536,6 @@ namespace basic {
 			return nullptr;
 		}
 
-
-
 		//根据id获取path
 		virtual I_SunnyTcsEdge* getEdgeById(qint32 id, bool& ok) {
 			QHash<qint32, I_SunnyTcsEdge*> phs;
@@ -496,15 +543,12 @@ namespace basic {
 			return phs.keys().contains(id) ? phs[id] : nullptr;
 		}
 
-
-
 		//根据id,得到vertex
 		virtual I_SunnyTcsVertex* getVertexById(qint32 id, bool& ok){
 			QHash<qint32, I_SunnyTcsVertex*> pts;
 			this->points(pts);
 			return pts.keys().contains(id) ? pts[id] : nullptr;
 		}
-
 
 
 		//根据id,获取外设
@@ -515,6 +559,29 @@ namespace basic {
 		}
 
 	};
+
+
+
+	//group接口的实现
+	class SunnyTcsItemGroup :public I_SunnyTcsGroup {
+	public:
+		SunnyTcsItemGroup(qint32 id,QString name):I_SunnyTcsGroup(id,name){}
+		virtual ~SunnyTcsItemGroup(){}
+
+		// 通过 I_SunnyTcsGroup 继承
+		virtual void registerGroup(I_SunnyTcsElementData * mem) override {
+			_members.insert(mem->getElementId(), mem);
+		}
+
+		virtual void dropRegister(qint32 id) override {
+			if (_members.contains(id)) {
+				_members.remove(id);
+			}
+		}
+
+	};
+
+
 
 }
 	

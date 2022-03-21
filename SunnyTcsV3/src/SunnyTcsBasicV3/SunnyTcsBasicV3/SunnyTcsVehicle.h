@@ -67,6 +67,8 @@ namespace basic {
 		//自身虚函数
 		virtual bool CreateOrderAction(std::shared_ptr<SunnyTcsOrder> craft, I_SunnyTcsActualData* data) = 0;
 		virtual bool updateCommand(std::shared_ptr<SunnyTcsOrder> craft, I_SunnyTcsActualData* data) = 0;//对route的订单列表进行处理
+		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual QJsonObject toJson()const { return QJsonObject(); }
 
 	protected:
 		qint32 _groupId; //默认组0，表示全部

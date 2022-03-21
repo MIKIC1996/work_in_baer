@@ -50,6 +50,87 @@ public:
 	virtual SunnyTcsMapObject_tag getItemTag() const override;
 	virtual QPainterPath shape()const override;
 
+	// Í¨¹ý SunnyTcsPath ¼Ì³Ð
+	virtual bool fromJson(QJsonObject& jobj , const QHash<qint32 , SunnyTcsPoint*>& pts)override {
+		if (
+			!jobj.contains(JSON_MAP_PATH_ID) ||
+			!jobj.contains(JSON_MAP_PATH_NAME) ||
+			!jobj.contains(JSON_MAP_PATH_SPT_POSI_DIRECTION) ||
+			!jobj.contains(JSON_MAP_PATH_SPT_NEGA_DIRECTION) ||
+			!jobj.contains(JSON_MAP_PATH_POSI_SPD) ||
+			!jobj.contains(JSON_MAP_PATH_NEGA_SPD) ||
+			!jobj.contains(JSON_MAP_PATH_IS_SCAN_ACTIVED) ||
+			!jobj.contains(JSON_MAP_PATH_POSI_SCAN) ||
+			!jobj.contains(JSON_MAP_PATH_NEGA_SCAN) ||
+			!jobj.contains(JSON_MAP_PATH_ST_ID) ||
+			!jobj.contains(JSON_MAP_PATH_ED_ID) ||
+			!jobj.contains(JSON_MAP_PATH_CT_ID)
+			) {
+			return false;
+		}
+
+		qint32 id = jobj[JSON_MAP_PATH_ID].toInt();
+		QString name = jobj[JSON_MAP_PATH_NAME].toString();
+		bool isSptPosi = jobj[JSON_MAP_PATH_SPT_POSI_DIRECTION].toBool();
+		bool isSptNega = jobj[JSON_MAP_PATH_SPT_NEGA_DIRECTION].toBool();
+		qint32 posiSpd = jobj[JSON_MAP_PATH_POSI_SPD].toInt();
+		qint32 negaSpd = jobj[JSON_MAP_PATH_NEGA_SPD].toInt();
+		bool isScanActived = jobj[JSON_MAP_PATH_IS_SCAN_ACTIVED].toBool();
+		qint32 posiScan = jobj[JSON_MAP_PATH_POSI_SCAN].toInt();
+		qint32 negaScan = jobj[JSON_MAP_PATH_NEGA_SCAN].toInt();
+		qint32 startId = jobj[JSON_MAP_PATH_ST_ID].toInt();
+		qint32 endId = jobj[JSON_MAP_PATH_ED_ID].toInt();
+		qint32 ctrlId = jobj[JSON_MAP_PATH_CT_ID].toInt();
+
+		if (!pts.contains(startId) || startId == endId || startId == ctrlId) {
+			return false;
+		}
+
+		if (!pts.contains(endId) || endId == ctrlId) {
+			return false;
+		}
+
+		if (!pts.contains(ctrlId) && ctrlId != 0) {
+			return false;
+		}
+
+		_start = pts[startId];
+		_end = pts[endId];
+		_ctrl = ctrlId == 0 ? nullptr : pts[ctrlId];
+		_id = id;
+		_name = name;
+		_isSupportPositive = isSptPosi;
+		_isSupportNegative = isSptNega;
+		_positiveSpeed = posiSpd;
+		_negativeSpeed = negaSpd;
+		_isScanAeraActived = isScanActived;
+		_positiveScanAera = posiScan;
+		_negativeScanAera = negaScan;
+		return true;
+	}
+
+	virtual QJsonObject toJson()const override {
+		QJsonObject jobj;
+		jobj[JSON_MAP_PATH_ID] = _id;
+		jobj[JSON_MAP_PATH_NAME] = _name;
+		jobj[JSON_MAP_PATH_SPT_POSI_DIRECTION] = _isSupportPositive;
+		jobj[JSON_MAP_PATH_SPT_NEGA_DIRECTION] = _isSupportNegative;
+		jobj[JSON_MAP_PATH_POSI_SPD] = _positiveSpeed;
+		jobj[JSON_MAP_PATH_NEGA_SPD] = _negativeSpeed;
+		jobj[JSON_MAP_PATH_IS_SCAN_ACTIVED] = _isScanAeraActived;
+		jobj[JSON_MAP_PATH_POSI_SCAN] = _positiveScanAera;
+		jobj[JSON_MAP_PATH_NEGA_SCAN] = _negativeScanAera;
+		jobj[JSON_MAP_PATH_ST_ID] = _start->getElementId();
+		jobj[JSON_MAP_PATH_ED_ID] = _end->getElementId();
+		if (_ctrl) {
+			jobj[JSON_MAP_PATH_CT_ID] = 0;
+		}
+		else {
+			jobj[JSON_MAP_PATH_CT_ID] = _ctrl->getElementId();
+		}
+		return jobj;
+	}
+
 private:
 	QPolygonF getArrow(QPointF from, QPointF to);
 

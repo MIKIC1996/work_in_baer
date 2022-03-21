@@ -121,9 +121,11 @@ void SunnyTcsGraphicsPath::paint(QPainter * painter, const QStyleOptionGraphicsI
 		_arrow_start = getArrow(st_arrow, end);
 		_arrow_end = getArrow((_ctrl ? st_arrow : end), start_copy);
 	}
-	
-	arrow.addPolygon(_arrow_start);
-	if (this->_isDoubleDirection) {
+	if (this->_isSupportPositive) {
+		arrow.addPolygon(_arrow_start);
+	}
+
+	if (this->_isSupportNegative) {
 		arrow.addPolygon(_arrow_end);
 	}
 	pen.setWidth(0);

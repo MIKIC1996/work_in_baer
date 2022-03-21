@@ -15,13 +15,18 @@ namespace basic {
 		virtual ~SunnyTcsLocation() {}
 		//assignment
 		SunnyTcsLocation& operator=(const SunnyTcsLocation&) = delete;
-		
+
+		const SunnyTcsPoint* getLinkPointPtr()const { return _linkedPt; }
 		void bindLinkPt(const SunnyTcsPoint* pt) { _linkedPt = pt; }
 
+		//继承虚函数
 		virtual qint32 getLinkedPointId() const override;
-		const SunnyTcsPoint* getLinkPointPtr()const { return _linkedPt; }
 		virtual SunnyTcsArg getAttribution(QString key, bool & ok) const override;
 		virtual bool setAttribution(QString key, SunnyTcsArg arg) override;
+
+		//自身虚函数
+		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual QJsonObject toJson()const { return QJsonObject(); }
 
 	protected:
 		const SunnyTcsPoint* _linkedPt;

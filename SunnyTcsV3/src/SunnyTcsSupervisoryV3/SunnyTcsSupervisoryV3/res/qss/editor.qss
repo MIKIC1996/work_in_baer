@@ -44,6 +44,8 @@ QStatusBar{
 	color:rgb(255,255,255);
 }
 
+QStatusBar::item{border: 0px}
+
 QMenuBar{
 	background:rgb(80, 90, 120);
 	color:rgb(255,255,255);

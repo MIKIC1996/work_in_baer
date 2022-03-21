@@ -387,7 +387,6 @@ namespace basic {
 				((result_type*)_resultBuffer) ->~result_type();
 				free(_resultBuffer); //这有问题，不知道为什么
 			}
-
 		}
 
 		//查询负载
@@ -395,7 +394,6 @@ namespace basic {
 
 		//获取结果缓存指针
 		inline void* getResultPtr() { return _resultBuffer; }
-
 
 		//submit
 		template<typename _Function, typename... _RestArgs>
@@ -408,6 +406,7 @@ namespace basic {
 			unit._manager = &(Handler::manager);//_manager
 			_submit_aux(unit, std::integral_constant<int, 0>(), std::forward<_RestArgs>(rest) ...);//params
 		}
+
 
 		//submit 成员函数
 		template<typename _Class, typename... _RestArgs>

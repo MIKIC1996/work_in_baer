@@ -73,13 +73,45 @@ class SunnyTcsMapAdjuster
 public:
 	
 	SunnyTcsMapAdjuster(qint32 wid, qint32 hei, qint32 resolution)
-		:_sceneWid(wid), _sceneHei(hei), _resolution(resolution),_status(E_EDIT),
-		_ptIdCounter(0),_phIdCounter(0),_locIdCounter(0),_veIdCounter(0)
+		:_sceneWid(wid), _sceneHei(hei), _resolution(resolution), _status(E_EDIT),_groupIdCounter(0),
+		_ptIdCounter(0), _phIdCounter(0), _locIdCounter(0), _veIdCounter(0), _isAutoTrafficControlOpen(true),
+		_ptIdQueue(),_phIdQueue(),_locIdQueue(),_veIdQueue(),_groupIdQueue()
 	{
+		if (resolution < 500) { //最小精度0.5m
+			_resolution = 500;
+		}
+		else if (resolution > 100000) { //最大精度100m
+			_resolution = 100000;
+		}
+	}
 
+	//getter
+	inline qint32 getWidth()const {
+		return _sceneWid;
+	}
+
+	inline qint32 getHeight()const {
+		return _sceneHei;
+	}
+
+	inline qint32 getResolution()const {
+		return _resolution;
+	}
+
+	inline bool isTrackActived()const {
+		return _isTrackActived;
 	}
 
 	//获取ID
+	qint32 nextGroupId() const{
+		if (!_groupIdQueue.empty()) {
+			qint32 top = _groupIdQueue.top();
+			_groupIdQueue.pop();
+			return top;
+		}
+		return ++_groupIdCounter;
+	}
+
 	qint32 nextPtId()const {
 		if (!_ptIdQueue.empty()) {
 			qint32 top = _ptIdQueue.top();
@@ -116,7 +148,21 @@ public:
 		return ++_veIdCounter;
 	}
 
+	bool isAutoTrafficControlOpen()const { return _isAutoTrafficControlOpen; }
+	E_SunnyTcsModelEditStatus getEditStatus()const { return _status; }
+
+
+	//setter
+	void setIsTrackActived(bool is) { _isTrackActived = is; }
+
+	void setEditStatus(E_SunnyTcsModelEditStatus status) { _status = status; }
+	void setAutoTrafficControlOpen(bool is) { _isAutoTrafficControlOpen = is; }
+
 	//归还ID
+	void returnGroupId(qint32 id)const {
+		_groupIdQueue.push(id);
+	}
+
 	void returnPtId(qint32 id)const {
 		_ptIdQueue.push(id);
 	}
@@ -133,14 +179,14 @@ public:
 		_veIdQueue.push(id);
 	}
 
-	//状态
-	E_SunnyTcsModelEditStatus _status = E_EDIT;
+	
 
+
+	
 	//地图宽高 区块分辨率
-	qreal _sceneWid;		//scene 宽
-	qreal _sceneHei;		//scene 高		
-	qreal _resolution;		//区块分辨率
-
+	qint32 _sceneWid;		//scene 宽
+	qint32 _sceneHei;		//scene 高		
+	qint32 _resolution;		//区块分辨率
 	//背景色
 	QColor _backColor = QColor(60, 60, 60); 
 	//select 选中的颜色必须统一
@@ -151,14 +197,25 @@ public:
 	QColor _item_error_color = Qt::red;
 
 protected:
+
+	//是否启动自动交通管制
+	bool _isAutoTrafficControlOpen;
+	//状态
+	E_SunnyTcsModelEditStatus _status = E_EDIT;
+
+	bool _isTrackActived = false;
+
+	mutable qint32 _groupIdCounter;
 	mutable qint32 _ptIdCounter;
 	mutable qint32 _phIdCounter;
 	mutable qint32 _locIdCounter;
 	mutable qint32 _veIdCounter;
-
+	mutable std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>> _groupIdQueue;//组ID
 	mutable std::priority_queue<qint32 ,std::vector<qint32>,std::greater<qint32>> _ptIdQueue;//当对象被删除，会归还ID,以供后续使用
 	mutable std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>> _phIdQueue;
 	mutable std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>> _locIdQueue;
 	mutable std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>> _veIdQueue;
 
 };
+
+

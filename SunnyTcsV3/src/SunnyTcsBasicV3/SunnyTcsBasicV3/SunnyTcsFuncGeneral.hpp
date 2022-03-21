@@ -61,37 +61,7 @@ namespace basic {
 	}
 
 
-	template<class T>
-	static QByteArray toBytes(const T& obj) {
-		int size = sizeof(T);
-		QByteArray bytes;
-		for (int i = 1; i <= size; ++i) {
-			uint8_t bye = (obj >> (size - i) * 8);
-			bye = (bye &= 0xff);
-			bytes.append(bye);
-		}
-		return bytes;
-	}
-
-
-	template<class T>
-	static T fromByte(QByteArray bytes) {
-		int size = sizeof(T);
-		if (bytes.count() < size) {
-			return 0;
-		}
-		T dst(0);
-		T temp(0);
-		int index{ 0 };
-		T basc(0xff);
-		for (int i = 0; i < size; ++i) {
-			temp = (T)(bytes.at(i));
-			index = size - i - 1;
-			dst |= ((temp << (index * 8)) & (basc << (index * 8)));
-		}
-		return dst;
-	}
-
+	
 
 	//S=(x1y2-x1y3+x2y3-x2y1+x3y1-x2y2) 三角形面积
 	static qreal triangularAera(qreal p1x, qreal p1y, qreal p2x, qreal p2y, qreal p3x, qreal p3y) {

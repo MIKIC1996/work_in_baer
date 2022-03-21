@@ -36,6 +36,16 @@ public:
 	virtual bool updateGraphicsData(const QByteArray & data) override;
 	virtual SunnyTcsAgvCode getVehicleCode() const override;
 
+
+	// 通过 SunnyTcsGraphicsVehicle 继承
+	virtual QString getVehicleIp() const override;
+
+	virtual void setVehicleIp(QString ip) override;
+
+	virtual quint16 getVehiclePort() const override;
+
+	virtual void setVehiclePort(quint16 port) override;
+
 };
 
 
@@ -72,6 +82,16 @@ public:
 	virtual SunnyTcsMapObject_tag getItemTag() const override;
 	virtual bool updateGraphicsData(const QByteArray & data) override;
 	virtual SunnyTcsAgvCode getVehicleCode() const override;
+
+
+	// 通过 SunnyTcsGraphicsVehicle 继承
+	virtual QString getVehicleIp() const override;
+
+	virtual void setVehicleIp(QString ip) override;
+
+	virtual quint16 getVehiclePort() const override;
+
+	virtual void setVehiclePort(quint16 port) override;
 
 };
 
@@ -110,5 +130,15 @@ public:
 	virtual SunnyTcsMapObject_tag getItemTag() const override;
 	virtual bool updateGraphicsData(const QByteArray & data) override;
 	virtual SunnyTcsAgvCode getVehicleCode() const override;
+
+
+	// 通过 SunnyTcsGraphicsVehicle 继承
+	virtual QString getVehicleIp() const override;
+
+	virtual void setVehicleIp(QString ip) override;
+
+	virtual quint16 getVehiclePort() const override;
+
+	virtual void setVehiclePort(quint16 port) override;
 
 };

@@ -225,6 +225,7 @@ namespace basic {
 		}
 	};
 
+
 	//Ã·Ωª
 	template<>
 	class SunnyTcsQueryStrFactory<MYSQL_COMMIT> {

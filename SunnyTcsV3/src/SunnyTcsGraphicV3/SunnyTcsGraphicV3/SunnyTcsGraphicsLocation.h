@@ -43,6 +43,17 @@ public:
 	virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = Q_NULLPTR) override;
 	virtual SunnyTcsMapObject_tag getItemTag() const override;
 
+	// Í¨¹ý SunnyTcsLocation ¼Ì³Ð
+	virtual bool fromJson(QJsonObject& jobj) override
+	{
+		return false; 
+	}
+	
+	virtual QJsonObject toJson()const override 
+	{ 
+		return QJsonObject(); 
+	}
+
 protected:
 	const SunnyTcsMapAdjuster* _ad;
 
