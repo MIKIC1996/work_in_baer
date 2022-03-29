@@ -58,6 +58,26 @@ extern gid_t getgid();
  *+++++++++++++++++++++++++++++++++++++++++++++ */
 extern gid_t getegid();
 
+/*++++++++++++++++++++++++++++++++++++++++++++++
+ *name: getresuid
+ *function: get saved set user id
+ *include: unistd.h
+ *params: void
+ *return: user id
+ *+++++++++++++++++++++++++++++++++++++++++++++ */
+extern uid_t getresuid();
+
+
+/*++++++++++++++++++++++++++++++++++++++++++++++
+ *name: getresgid
+ *function: get saved set group id
+ *include: unistd.h
+ *params: void
+ *return: group id
+ *+++++++++++++++++++++++++++++++++++++++++++++ */
+extern gid_t getresgid();
+
+
 int main(int argc, char const *argv[])
 {
     /* code */
@@ -66,8 +86,10 @@ int main(int argc, char const *argv[])
     printf("ppid:%d\n", getppid());
     printf("uid:%d\n",getuid());
     printf("euid:%d\n", geteuid());
+    printf("resuid:%d\n",getresuid());
     printf("gid:%d\n", getgid());
     printf( "egid:%d\n",getegid());
+    printf("resgid:%d\n",getresgid());
 
     return 0;
 }

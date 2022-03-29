@@ -9,7 +9,8 @@
 
 /*++++++++++++++++++++++++++++++++++++++++++++++
  *name: wait
- *function: wait until a son process is terminated,get status infomation. if a son process is terminated before execute wait(),
+ *function: wait until a son process is terminated,get status infomation. 
+            if a son process is terminated before execute wait(),
             wait will return soon;
  *include: sys/wait.h
  *params: 1. statloc , pointer to position which will be writed with son process end infomation 
