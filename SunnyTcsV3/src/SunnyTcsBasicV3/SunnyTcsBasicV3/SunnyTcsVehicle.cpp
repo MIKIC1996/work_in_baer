@@ -3,8 +3,7 @@
 
 namespace basic {
 
-	QList<SunnyTcsAgvCode> SunnyTcsVehicle::_vehicleSupported;
-	bool SunnyTcsVehicle::isInited = initVehicleSupportedList();
+	
 
 
 	SunnyTcsVehicle::SunnyTcsVehicle(SunnyTcsAgvCode code, qint32 id)

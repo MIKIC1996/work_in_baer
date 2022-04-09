@@ -87,10 +87,10 @@ void SunnyTcsGraphicsVehicle_mitsubishi_battery::paint(QPainter * painter, const
 	}
 	else {
 		if (this->isSelected()) {
-			painter->drawImage(QRectF(-2000, -1400, 4000, 2800), _image_selected);
+			painter->drawImage(QRectF(-2200, -1400, 4400, 2800), _image_selected);
 		}
 		else {
-			painter->drawImage(QRectF(-2000, -1400, 4000, 2800), _image);
+			painter->drawImage(QRectF(-2200, -1400, 4400, 2800), _image);
 		}
 	}
 }
@@ -198,4 +198,20 @@ quint16 SunnyTcsGraphicsVehicle_daimler_engine::getVehiclePort() const
 void SunnyTcsGraphicsVehicle_daimler_engine::setVehiclePort(quint16 port)
 {
 	_port = port;
+}
+
+
+SunnyTcsGraphicsVehicle * SunnyTcsGraphicsVehicleFactory::createVehicleByCode(qint32 code, 
+	const SunnyTcsGraphicsCoorSys * cs, const SunnyTcsMapAdjuster * ad)const
+{
+	if (code == vehicle_normal._agvType) {
+		return new SunnyTcsGraphicsVehicle_normal(cs,ad);
+	}
+	else if (code == vehicle_mitsubishi._agvType) {
+		return new SunnyTcsGraphicsVehicle_mitsubishi_battery(cs,ad);
+	}
+	else if (code == vehicle_daimler_engine._agvType) {
+		return new SunnyTcsGraphicsVehicle_daimler_engine(cs, ad);
+	}
+	return nullptr;
 }

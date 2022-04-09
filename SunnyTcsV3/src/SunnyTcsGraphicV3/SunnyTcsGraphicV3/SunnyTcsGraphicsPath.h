@@ -66,10 +66,22 @@ public:
 			!jobj.contains(JSON_MAP_PATH_ED_ID) ||
 			!jobj.contains(JSON_MAP_PATH_CT_ID)
 			) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_FROM_JSON_NO_TAG>::err_info_cn);
 			return false;
 		}
 
 		qint32 id = jobj[JSON_MAP_PATH_ID].toInt();
+		if (id != _id) {
+			if (_ad->applyForPathId(id)) {
+				_ad->returnPhId(_id);
+			}
+			else {
+				throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR>::err_info_cn)
+					+ QSTRING_GBK(": path apply id %1").arg(QString::number(id));
+				return false;
+			}
+		}
+		
 		QString name = jobj[JSON_MAP_PATH_NAME].toString();
 		bool isSptPosi = jobj[JSON_MAP_PATH_SPT_POSI_DIRECTION].toBool();
 		bool isSptNega = jobj[JSON_MAP_PATH_SPT_NEGA_DIRECTION].toBool();
@@ -83,19 +95,30 @@ public:
 		qint32 ctrlId = jobj[JSON_MAP_PATH_CT_ID].toInt();
 
 		if (!pts.contains(startId) || startId == endId || startId == ctrlId) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_START_POINT_NO_ID>::err_info_cn) 
+				+QString(": path %1 ,start id %2").arg(QString::number(id)).arg(QString::number(startId));
 			return false;
 		}
 
 		if (!pts.contains(endId) || endId == ctrlId) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_END_POINT_NO_ID>::err_info_cn)
+				+ QString(": path %1 ,end id %2").arg(QString::number(id)).arg(QString::number(endId));
 			return false;
 		}
 
 		if (!pts.contains(ctrlId) && ctrlId != 0) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_CTRL_POINT_NO_ID>::err_info_cn)
+				+ QString(": path %1 ,ctrl id %2").arg(QString::number(id)).arg(QString::number(ctrlId));
 			return false;
 		}
 
 		_start = pts[startId];
 		_end = pts[endId];
+		
+		const SunnyTcsGraphicsPoint* stptr = dynamic_cast<const SunnyTcsGraphicsPoint*>(_start);
+		const SunnyTcsGraphicsPoint* edptr = dynamic_cast<const SunnyTcsGraphicsPoint*>(_end);
+		this->setPos((stptr->pos().x() + edptr->pos().x()) / 2, (stptr->pos().y() + edptr->pos().y()) / 2);
+
 		_ctrl = ctrlId == 0 ? nullptr : pts[ctrlId];
 		_id = id;
 		_name = name;
@@ -122,7 +145,7 @@ public:
 		jobj[JSON_MAP_PATH_NEGA_SCAN] = _negativeScanAera;
 		jobj[JSON_MAP_PATH_ST_ID] = _start->getElementId();
 		jobj[JSON_MAP_PATH_ED_ID] = _end->getElementId();
-		if (_ctrl) {
+		if (!_ctrl) {
 			jobj[JSON_MAP_PATH_CT_ID] = 0;
 		}
 		else {

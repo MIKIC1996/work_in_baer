@@ -1,11 +1,11 @@
 #pragma once
 #include "sunnytcsbasicv3_global.h"
-
+#include "SunnyTcsLibGeneral.hpp"
 
 //枚举类型转换检查
 #define E_ARG_TYPE_CHECK(p)  if(!((p>=0 && p<=0x0D )||(p>=0x71 && p<=0x78))){Q_ASSERT(0);}
-//SunnyTcsArg 的 头大小
-#define ARG_HEAD_LENGTH 5
+//SunnyTcsByteArg 的 头大小
+#define ARG_HEAD_LENGTH 8
 
 
 #define _THROW_FROMBYTES_ERROR throw (SunnyTcsException<ERROR_BASIC_ARG_FROMBYTE_ERROR>)
@@ -38,29 +38,29 @@ namespace basic {
 		//obt
 		ARG_CHAR = 0x01,
 		ARG_BOOL = 0x02,
-		ARG_MIXED = 0x03,
+		ARG_MIXED = 0x04,
 		//signed
-		ARG_INT8 = 0x04,
-		ARG_INT16 = 0x05,
-		ARG_INT32 = 0x06,
-		ARG_INT64 = 0x07,
+		ARG_INT8 = 0x08,
+		ARG_INT16 = 0x10,
+		ARG_INT32 = 0x20,
+		ARG_INT64 = 0x40,
 		//unsigned
-		ARG_UINT8 = 0x08,
-		ARG_UINT16 = 0x09,
-		ARG_UINT32 = 0x0A,
-		ARG_UINT64 = 0x0B,
+		ARG_UINT8 = 0x80,
+		ARG_UINT16 = 0x0100,
+		ARG_UINT32 = 0x0200,
+		ARG_UINT64 = 0x0400,
 		//oth
-		ARG_QBYTEARRAY = 0x0C,
-		ARG_QSTRING = 0x0D,
+		ARG_QBYTEARRAY = 0x0800,
+		ARG_QSTRING = 0x1000,
 		//reserve
-		ARG_RESERVE_01 = 0x71,
-		ARG_RESERVE_02 = 0x72,
-		ARG_RESERVE_03 = 0x73,
-		ARG_RESERVE_04 = 0x74,
-		ARG_RESERVE_05 = 0x75,
-		ARG_RESERVE_06 = 0x76,
-		ARG_RESERVE_07 = 0x77,
-		ARG_RESERVE_08 = 0x78
+		ARG_RESERVE_01 = 0x2000,
+		ARG_RESERVE_02 = 0x4000,
+		ARG_RESERVE_03 = 0x8000,
+		ARG_RESERVE_04 = 0x010000,
+		ARG_RESERVE_05 = 0x020000,
+		ARG_RESERVE_06 = 0x040000,
+		ARG_RESERVE_07 = 0x080000,
+		ARG_RESERVE_08 = 0x100000
 	};
 
 
@@ -82,7 +82,7 @@ namespace basic {
 		template<class T>
 		static T fromByte(QByteArray bytes) {
 			int size = sizeof(T);
-			if (bytes.count() < size) {
+			if (bytes.count() != size) {
 				return 0;
 			}
 			T dst(0);
@@ -175,6 +175,7 @@ namespace basic {
 	class SunnyTcsArgTraits<char_tcs> {
 	public:
 		typedef char_tcs type;
+		static constexpr char* decp = "char";
 
 		static qint32 size(char_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_CHAR; }
@@ -207,6 +208,7 @@ namespace basic {
 	class SunnyTcsArgTraits<bool_tcs> {
 	public:
 		typedef bool_tcs type;
+		static constexpr char* decp = "bool";
 
 		static qint32 size(bool_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_BOOL; }
@@ -239,6 +241,7 @@ namespace basic {
 	class SunnyTcsArgTraits<int8_tcs> {
 	public:
 		typedef int8_tcs type;
+		static constexpr char* decp = "int8";
 
 		static qint32 size(int8_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_INT8; }
@@ -271,6 +274,7 @@ namespace basic {
 	class SunnyTcsArgTraits<int16_tcs> {
 	public:
 		typedef int16_tcs type;
+		static constexpr char* decp = "int16";
 
 		static qint32 size(int16_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_INT16; }
@@ -304,6 +308,7 @@ namespace basic {
 	class SunnyTcsArgTraits<int32_tcs> {
 	public:
 		typedef int32_tcs type;
+		static constexpr char* decp = "int32";
 
 		static qint32 size(int32_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_INT32; }
@@ -336,6 +341,7 @@ namespace basic {
 	class SunnyTcsArgTraits<int64_tcs> {
 	public:
 		typedef int64_t type;
+		static constexpr char* decp = "int64";
 
 		static qint32 size(int64_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_INT64; }
@@ -368,6 +374,7 @@ namespace basic {
 	class SunnyTcsArgTraits<uint8_tcs> {
 	public:
 		typedef uint8_tcs type;
+		static constexpr char* decp = "uint8";
 
 		static qint32 size(uint8_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_UINT8; }
@@ -400,6 +407,7 @@ namespace basic {
 	class SunnyTcsArgTraits<uint16_tcs> {
 	public:
 		typedef uint16_tcs type;
+		static constexpr char* decp = "uint16";
 
 		static qint32 size(uint16_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_UINT16; }
@@ -432,6 +440,7 @@ namespace basic {
 	class SunnyTcsArgTraits<uint32_tcs> {
 	public:
 		typedef uint32_tcs type;
+		static constexpr char* decp = "uint32";
 
 		static qint32 size(uint32_tcs arg) { return sizeof(uint32_tcs); }
 		static E_ARG_TYPE argType() { return ARG_UINT32; }
@@ -464,6 +473,7 @@ namespace basic {
 	class SunnyTcsArgTraits<uint64_tcs> {
 	public:
 		typedef uint64_tcs type;
+		static constexpr char* decp = "uint64";
 
 		static qint32 size(uint64_tcs arg) { return sizeof(arg); }
 		static E_ARG_TYPE argType() { return ARG_UINT64; }
@@ -496,6 +506,7 @@ namespace basic {
 	class SunnyTcsArgTraits<byteArray_tcs> {
 	public:
 		typedef byteArray_tcs type;
+		static constexpr char* decp = "byteArray";
 
 		static qint32 size(byteArray_tcs arg) { return arg.count(); }
 		static E_ARG_TYPE argType() { return ARG_QBYTEARRAY; }
@@ -523,6 +534,7 @@ namespace basic {
 	class SunnyTcsArgTraits<string_tcs> {
 	public:
 		typedef string_tcs type;
+		static constexpr char* decp = "string";
 
 		static qint32 size(string_tcs arg) { return arg.count(); }
 		static E_ARG_TYPE argType() { return ARG_QSTRING; }
@@ -554,17 +566,10 @@ namespace basic {
 	
 
 	//万用类型的容器，通过将类型按照一定的规则转为字节存储，规则由SunnyTcsArgTraits 规定
-	class SunnyTcsArg 
+	class SunnyTcsByteArg 
 	{
 	public:
 
-		//从字节解析时无法通过类型指令cimp函数指针，所以不得已要有这个_cimpHash
-// 		static bool _inited;
-// 		static QHash<E_ARG_TYPE, cimp> _cimpHash;
-// 		static bool initFuncion() { //初始化函数
-// 			//_cimpHash.insert()
-// 			return true;
-// 		}
 
 		//获取值元函数
 		template<typename Arg_type>
@@ -576,8 +581,8 @@ namespace basic {
 		};
 
 		//左值版本，允许传入比需要数更多的bytes，不会对bytes自动删除已分析部分
-		static SunnyTcsArg fromBytes(const QByteArray& bytes, bool& ok) {
-			SunnyTcsArg arg;
+		static SunnyTcsByteArg fromBytes(const QByteArray& bytes, bool& ok) {
+			SunnyTcsByteArg arg;
 			qint32 count = 0;
 			ok = arg.fromBytes(bytes, count);
 			if (!ok) {
@@ -588,8 +593,8 @@ namespace basic {
 		}
 
 		//传入右值的版本，每次分析成功，都会从右值中删除 已经分析的部分
-		static SunnyTcsArg fromBytes(QByteArray&& bytes, bool& ok) {
-			SunnyTcsArg arg;
+		static SunnyTcsByteArg fromBytes(QByteArray&& bytes, bool& ok) {
+			SunnyTcsByteArg arg;
 			qint32 count = 0;
 			ok = arg.fromBytes(bytes, count);
 			if (!ok) {
@@ -609,32 +614,32 @@ namespace basic {
 
 
 		//ctor
-		SunnyTcsArg() :_value(), _size(ARG_HEAD_LENGTH), _type(ARG_UNDEFINED),_cf(nullptr)
+		SunnyTcsByteArg() :_value(), _size(ARG_HEAD_LENGTH), _type(ARG_UNDEFINED),_cf(nullptr)
 		{}
 
 		template<typename Arg_type>
-		SunnyTcsArg(Arg_type&& val) //并没有对隐式转换添加限制
+		explicit SunnyTcsByteArg(Arg_type&& val)
 			:_value(SunnyTcsArgTraits<Arg_type>::toBytes(std::forward<Arg_type>(val))),//完美转发
 			_size(SunnyTcsArgTraits<Arg_type>::size(val) + ARG_HEAD_LENGTH),
 			_type(SunnyTcsArgTraits<Arg_type>::argType()),_cf(&SunnyTcsArgTraits<Arg_type>::constructInMemoryPointed)
 		{}
 
 		//copy ctor
-		SunnyTcsArg(const SunnyTcsArg& arg) :_type(arg._type), _size(arg._size), _value(arg._value),_cf(arg._cf) {}
+		SunnyTcsByteArg(const SunnyTcsByteArg& arg) :_type(arg._type), _size(arg._size), _value(arg._value),_cf(arg._cf) {}
 
 		//move ctor
-		SunnyTcsArg(SunnyTcsArg&& arg) noexcept
+		SunnyTcsByteArg(SunnyTcsByteArg&& arg) noexcept
 			: _type(arg._type), _size(arg._size), _value(),_cf(arg._cf)
 		{
 			_value.swap(arg._value);
 		}
 
 		//dtor
-		virtual ~SunnyTcsArg() {}
+		virtual ~SunnyTcsByteArg() {}
 
 		//assignment
 		template<typename T>
-		SunnyTcsArg& operator=(T&& rhs) {
+		SunnyTcsByteArg& operator=(T&& rhs) {
 			_type = SunnyTcsArgTraits<T>::argType();
 			_size = SunnyTcsArgTraits<T>::size(rhs) + ARG_HEAD_LENGTH;
 			_value = SunnyTcsArgTraits<T>::toBytes(std::forward<T>(rhs));
@@ -643,7 +648,7 @@ namespace basic {
 		}
 
 		//assignment
-		SunnyTcsArg& operator=(const SunnyTcsArg& rhs) {
+		SunnyTcsByteArg& operator=(const SunnyTcsByteArg& rhs) {
 			_type = rhs._type;
 			_size = rhs._size;
 			_value = rhs._value;
@@ -652,7 +657,7 @@ namespace basic {
 		}
 
 		//move assignment
-		SunnyTcsArg& operator=(SunnyTcsArg&& rhs) noexcept {
+		SunnyTcsByteArg& operator=(SunnyTcsByteArg&& rhs) noexcept {
 			_type = rhs._type;
 			_size = rhs._size;
 			_cf = rhs._cf;
@@ -711,7 +716,7 @@ namespace basic {
 		}
 
 
-		bool operator==(const SunnyTcsArg& arg) const {
+		bool operator==(const SunnyTcsByteArg& arg) const {
 			return (arg._type == this->_type && arg._value == this->_value&&_cf == arg._cf);
 		}
 
@@ -788,7 +793,7 @@ namespace basic {
 
 
 		template<>
-		bool operator>(const SunnyTcsArg& arg)const {
+		bool operator>(const SunnyTcsByteArg& arg)const {
 			bool ok2 = false;
 			bool ret = false;
 			switch (arg._type){
@@ -861,8 +866,7 @@ namespace basic {
 				if (bytes.count() < ARG_HEAD_LENGTH) {
 					break;
 				}
-				int typeVal = SunnyTcsBytesTransformer::fromByte<qint8>(bytes.mid(0, 1));
-				E_ARG_TYPE_CHECK(typeVal);
+				int typeVal = SunnyTcsBytesTransformer::fromByte<qint32>(bytes.mid(0, 4));
 				_type = static_cast<E_ARG_TYPE>(typeVal);
 				_size = SunnyTcsBytesTransformer::fromByte<qint32>(bytes.mid(1, 4));
 				if (_size > bytes.count()) {//_size是指整个arg的大小
@@ -881,7 +885,7 @@ namespace basic {
 		QByteArray toBytes()const
 		{
 			QByteArray ret;
-			ret.append(SunnyTcsBytesTransformer::toBytes<qint8>(static_cast<qint8>(_type)));
+			ret.append(SunnyTcsBytesTransformer::toBytes<qint32>(static_cast<qint32>(_type)));
 			ret.append(SunnyTcsBytesTransformer::toBytes<qint32>(_size));
 			ret.append(_value);
 			return std::move(ret);
@@ -1029,7 +1033,6 @@ namespace basic {
 		QByteArray _value;
 		cimp _cf;
 	};
-
 
 
 }

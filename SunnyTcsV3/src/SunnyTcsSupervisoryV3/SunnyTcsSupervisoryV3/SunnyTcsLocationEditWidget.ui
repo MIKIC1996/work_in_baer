@@ -6,62 +6,112 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
-    <height>447</height>
+    <width>746</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>SunnyTcsLocationEditWidget</string>
+   <string>指令编辑</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="SunnyTcsSupervisoryV3.qrc">
+    <normaloff>:/resource/res/image/editAcn.png</normaloff>:/resource/res/image/editAcn.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <property name="leftMargin">
+    <number>4</number>
+   </property>
+   <property name="topMargin">
+    <number>4</number>
+   </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
+   <property name="bottomMargin">
+    <number>4</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>3</number>
+     </property>
      <item>
-      <widget class="QToolButton" name="toolButton_3">
+      <widget class="QToolButton" name="addLineTbtn">
        <property name="text">
         <string>添加指令</string>
        </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/add2.png</normaloff>:/resource/res/image/add2.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_4">
+      <widget class="QToolButton" name="decLineTbtn">
        <property name="text">
         <string>删除指令</string>
        </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/dec.png</normaloff>:/resource/res/image/dec.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_5">
+      <widget class="QToolButton" name="clearLineTbtn">
        <property name="text">
         <string>清空</string>
        </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/delete.png</normaloff>:/resource/res/image/delete.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_6">
+      <widget class="QToolButton" name="moveUpTbtn">
        <property name="text">
         <string>上移</string>
        </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/moveUpLine.png</normaloff>:/resource/res/image/moveUpLine.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_7">
+      <widget class="QToolButton" name="moveDownTbtn">
        <property name="text">
         <string>下移</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="toolButton_8">
-       <property name="text">
-        <string>到顶</string>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/moveDownLine.png</normaloff>:/resource/res/image/moveDownLine.png</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_9">
+      <widget class="QToolButton" name="moveTopTbtn">
+       <property name="text">
+        <string>到顶</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/toTop.png</normaloff>:/resource/res/image/toTop.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="moveBottomTbtn">
        <property name="text">
         <string>到底</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/toBottom.png</normaloff>:/resource/res/image/toBottom.png</iconset>
        </property>
       </widget>
      </item>
@@ -81,18 +131,68 @@
     </layout>
    </item>
    <item>
-    <widget class="SunnyTcsActionTableWidget" name="tableWidget"/>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="resetTbtn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/flush.png</normaloff>:/resource/res/image/flush.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>80</width>
+         <height>20</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="saveTbtn">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/panel_show.png</normaloff>:/resource/res/image/panel_show.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>80</width>
+         <height>20</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>SunnyTcsActionTableWidget</class>
-   <extends>QTableWidget</extends>
-   <header>SunnyTcsActionTableWidget.h</header>
-  </customwidget>
- </customwidgets>
- <resources/>
+ <resources>
+  <include location="SunnyTcsSupervisoryV3.qrc"/>
+ </resources>
  <connections/>
 </ui>

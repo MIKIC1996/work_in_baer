@@ -2,8 +2,7 @@
 
 #include "sunnytcsbasicv3_global.h"
 #include "SunnyTcsLibGeneral.hpp"
-#include "SunnyTcsGeneralArg.hpp"
-
+#include "SunnyTcsTypeArg.h"
 
 #define MSG_HEAD_MARK "MSGH"
 #define MSG_HEAD_LENGTH 34
@@ -19,7 +18,7 @@ namespace basic {
 		是否广播 bool
 		是否需要回复，不回复会重发 bool
 		目的地 qint16 目标服务ID,或者 群组ID
-		来源   qint16
+		来源   qint16	
 		消息总长度 qint32 包括消息头
 	】
 	消息数据体【
@@ -171,14 +170,14 @@ namespace basic {
 
 		template<typename T>
 		bool appendArg(T&& arg) {
-			Q_ASSERT(_header&&_body);
-			SunnyTcsArg ag(std::forward<T>(arg));
-			if (ag.getType() == ARG_UNDEFINED) {
-				Q_ASSERT(0);
-				return false; //使用了未注册的类型
-			}
-			_body->append(std::move(ag));
-			_header->_msgBodyLength += ag.getSize();
+// 			Q_ASSERT(_header&&_body);
+// 			SunnyTcsArg ag(std::forward<T>(arg));
+// 			if (ag.getType() == ARG_UNDEFINED) {
+// 				Q_ASSERT(0);
+// 				return false; //使用了未注册的类型
+// 			}
+// 			_body->append(std::move(ag));
+// 			_header->_msgBodyLength += ag.getSize();
 			return true;
 		}
 

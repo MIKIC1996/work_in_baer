@@ -51,7 +51,7 @@ namespace basic {
 			return *this;
 		}
 
-		bool operator==(const SunnyTcsConditionValue& rhs) {
+		bool operator==(const SunnyTcsConditionValue& rhs) const{
 			return _targetType == rhs._targetType && _ope == rhs._ope && _conditionId == rhs._conditionId && _value == rhs._value;
 		}
 

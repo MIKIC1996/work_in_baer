@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SunnyTcsLocAttributionEditWidget</class>
+ <widget class="QWidget" name="SunnyTcsLocAttributionEditWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>336</width>
+    <height>387</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SunnyTcsLocAttributionEditWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="moveUpTbtn">
+       <property name="text">
+        <string>上移</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/moveUp.png</normaloff>:/resource/res/image/moveUp.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="moveDownTbtn">
+       <property name="text">
+        <string>下移</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/moveDown.png</normaloff>:/resource/res/image/moveDown.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="addTbtn">
+       <property name="text">
+        <string>添加</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/add2.png</normaloff>:/resource/res/image/add2.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="deleteTbtn">
+       <property name="text">
+        <string>删除</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/delete.png</normaloff>:/resource/res/image/delete.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="okTbtn">
+       <property name="text">
+        <string>确定</string>
+       </property>
+       <property name="icon">
+        <iconset resource="SunnyTcsSupervisoryV3.qrc">
+         <normaloff>:/resource/res/image/panel_show.png</normaloff>:/resource/res/image/panel_show.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>参数类型</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignCenter</set>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="SunnyTcsSupervisoryV3.qrc"/>
+ </resources>
+ <connections/>
+</ui>

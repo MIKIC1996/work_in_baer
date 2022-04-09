@@ -3,10 +3,11 @@
 
 
 
-SunnyTcsGraphicsModel::SunnyTcsGraphicsModel(quint64 id, QString name, qint32 wid, qint32 hei, qint32 resolution)
-	: SunnyTcsMapAdjuster(wid,hei,resolution) , _id(id), _name(name),_pathTempPoint(nullptr),_pathTemp(nullptr),_pts(),_phs(),_locs(),_cs(nullptr),_aera(nullptr)
+SunnyTcsGraphicsModel::SunnyTcsGraphicsModel(qint32 id, QString name, qint32 wid, qint32 hei, qint32 resolution)
+	: SunnyTcsMapAdjuster(wid,hei,resolution) , _id(id), _name(name),_pathTempPoint(nullptr),
+	_pathTemp(nullptr),_pts(),_phs(),_locs(),_cs(nullptr),_aera(nullptr)
 {
-
+	_veFactory = new SunnyTcsGraphicsVehicleFactory();
 	setItemIndexMethod(QGraphicsScene::ItemIndexMethod::NoIndex);//内部索引在 图元delete后 会导致奔溃
 	_cs = new SunnyTcsGraphicsCoorSys(QPointF(0, 0), this);
 	this->addItem(_cs);
@@ -15,6 +16,42 @@ SunnyTcsGraphicsModel::SunnyTcsGraphicsModel(quint64 id, QString name, qint32 wi
 }
 
 
+
+QPointF SunnyTcsGraphicsModel::getTrackPoint(QPointF pt) const
+{
+	SunnyTcsAgvCoordinate&& rxy = _cs->transformToReality(SunnyTcsAgvCoordinate(E_TWO_DIMENSION, pt.x(), pt.y()));//将场景坐标转换为 现实坐标
+	qint32 stepx = rxy._x / _resolution;
+	qint32 stepy = rxy._y / _resolution;
+	qint32 inayx = rxy._x % _resolution;
+	qint32 inayy = rxy._y % _resolution;
+	qreal inaccuracyAllowed = _resolution * 0.1;
+
+	if ((qAbs(inayx) > inaccuracyAllowed && _resolution - qAbs(inayx) > inaccuracyAllowed) ||
+		(qAbs(inayy) > inaccuracyAllowed && _resolution - qAbs(inayy) > inaccuracyAllowed)) {
+		return pt;
+	}
+
+	if (qAbs(inayx) > qAbs(_resolution - inaccuracyAllowed)) {
+		if (stepx == 0) {
+			stepx += inayx > 0 ? 1 : -1;
+		}
+		else {
+			stepx += stepx > 0 ? 1 : -1;
+		}
+	}
+	if (qAbs(inayy) > qAbs(_resolution - inaccuracyAllowed)) {
+		if (stepy == 0) {
+			stepy += inayy > 0 ? 1 : -1;
+		}
+		else {
+			stepy += stepy > 0 ? 1 : -1;
+		}
+	}
+	rxy._x = stepx * _resolution;
+	rxy._y = stepy * _resolution;
+	SunnyTcsAgvCoordinate&& sxy = _cs->transformToScene(rxy);
+	return QPointF(sxy._x, sxy._y);
+}
 
 bool SunnyTcsGraphicsModel::isOutOfSceneRect(QPointF pt) const
 {
@@ -447,7 +484,7 @@ SunnyTcsGraphicsPoint* SunnyTcsGraphicsModel::addGraphicsPoint(QPointF pt)
 		throw SunnyTcsException<ERROR_GRAPHICS_POINT_OUT_SCENE>();
 	}
 	SunnyTcsGraphicsPoint* ptr = new SunnyTcsGraphicsPoint(_cs, this, pt);
-	addGraphicsPoint(ptr);
+	Q_ASSERT(addGraphicsPoint(ptr)); //出现重复ID的情况就中断，说明ID 分配存在问题，且错误不可逆
 	return ptr;
 }
 
@@ -481,8 +518,11 @@ SunnyTcsGraphicsLocation*  SunnyTcsGraphicsModel::addGraphicsLocation(QPointF pt
 	SunnyTcsMapGraphicItem* item = dynamic_cast<SunnyTcsMapGraphicItem*>(itemAt(pt, QTransform()));
 	if (item && item->getItemTag()._eletype == Epoint) {
 		SunnyTcsGraphicsLocation* loc = new SunnyTcsGraphicsLocation(this,_pts[item->getItemId()]);
-		addGraphicsLocation(loc);
+		Q_ASSERT( addGraphicsLocation(loc));
 		return loc;
+	}
+	else { //当前位置不存在点，工位无法依附
+		throw SunnyTcsException<ERROR_GRAPHICS_LOCATION_NO_LINK_POINT>();
 	}
 	return nullptr;
 }
@@ -491,6 +531,10 @@ SunnyTcsGraphicsLocation*  SunnyTcsGraphicsModel::addGraphicsLocation(QPointF pt
 
 SunnyTcsGraphicsVehicle* SunnyTcsGraphicsModel::addGraphicsVehicle(QPointF pt, SunnyTcsAgvCode code)
 {
+	if (isOutOfSceneRect(pt)) {
+		throw SunnyTcsException<ERROR_GRAPHICS_VEHICLE_OUT_SCENE>(); //超过了场景坐标
+	}
+
 	SunnyTcsGraphicsVehicle* ve = nullptr;
 	if (code == vehicle_normal) {
 		 ve = new SunnyTcsGraphicsVehicle_normal(_cs, this, pt);
@@ -503,7 +547,7 @@ SunnyTcsGraphicsVehicle* SunnyTcsGraphicsModel::addGraphicsVehicle(QPointF pt, S
 	}
 
 	if (ve) {
-		addGraphicsVehicle(ve);
+		Q_ASSERT( addGraphicsVehicle(ve) ); //正常运行过程中，这里是不允许返回false的，所以采用断言
 	}
 	return ve;
 }
@@ -752,11 +796,46 @@ void SunnyTcsGraphicsModel::yEqualDistributionOfPoints()
 	}
 }
 
+bool SunnyTcsGraphicsModel::checkIsPointUsedByPathOrLoc(qint32 ptId)
+{
+	for (auto ptr : _phs) {
+		if (ptr->getStart()->getElementId() == ptId || ptr->getEnd()->getElementId() == ptId ||
+			(ptr->getCtrl() && ptr->getCtrl()->getElementId() == ptId)
+			) {
+			return true;
+		}
+	}
 
+	for (auto ptr : _locs) {
+		if (ptr->getLinkedPointId() == ptId) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
+bool SunnyTcsGraphicsModel::setImagePath(QString path)
+{
+	_backGroundPixmapPath = path;
+	_backGroundPixmap = QImage(path);
+	if (_backGroundPixmap.isNull()) {
+		return false;
+	}
+	return true;
+}
 
 void SunnyTcsGraphicsModel::drawBackground(QPainter * painter, const QRectF & rect)
 {
-	painter->fillRect(this->sceneRect(), QColor(70, 80, 110));
+	if (_backGroundPixmap.isNull()) {
+		painter->fillRect(this->sceneRect(), QColor(70, 80, 110));
+	}
+	else {
+		painter->drawImage(this->sceneRect(), _backGroundPixmap);
+	}
+	
 
 	qreal wid = _sceneWid;
 	qreal hei = _sceneHei;
@@ -808,6 +887,26 @@ void SunnyTcsGraphicsModel::drawBackground(QPainter * painter, const QRectF & re
 		painter->drawText(QRectF(cur_x + 500.0, cur_y - i + 500.0, 3000.0, 3000.0), QString::number(axis_y_up ? i : -i) + QString("mm"));
 		painter->setPen(pen);
 	}
+}
+
+void SunnyTcsGraphicsModel::releaseAllSource()
+{
+	for (auto ptr : this->items()) {
+		removeItem(ptr);
+	}
+	for (auto ptr : _ves) {
+		delete ptr;
+	}
+	for (auto ptr : _locs) {
+		delete ptr;
+	}
+	for (auto ptr : _phs) {
+		delete ptr;
+	}
+	for (auto ptr : _pts) {
+		delete ptr;
+	}
+
 }
 
 

@@ -21,6 +21,8 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QHeaderView>
+#include <QSpinBox>
+#include <QFileDialog>
 
 
 //用户操作接口,用以支持撤销与重做功能

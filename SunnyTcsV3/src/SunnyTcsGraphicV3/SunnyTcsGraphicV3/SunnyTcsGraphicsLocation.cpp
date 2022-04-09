@@ -11,7 +11,7 @@ SunnyTcsGraphicsLocation::SunnyTcsGraphicsLocation(const SunnyTcsMapAdjuster * a
 	:SunnyTcsLocation(ad->nextLocId(), pt), SunnyTcsMapGraphicItem(""),  _ad(ad)
 {
 	_name = QString("location%1").arg(QString::number(_id));
-	this->setPos(pt->pos());
+	if(_linkedPt)this->setPos(pt->pos());
 	this->setZValue(4);
 }
 

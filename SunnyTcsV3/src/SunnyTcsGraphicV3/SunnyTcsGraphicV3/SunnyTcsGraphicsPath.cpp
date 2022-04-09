@@ -10,12 +10,13 @@ SunnyTcsGraphicsPath::SunnyTcsGraphicsPath( const SunnyTcsMapAdjuster * ad, cons
 	_last_start(),_last_end(),_last_ctrl(),_arrow_start(),_arrow_end(),
 	_isStartNew(false),_isEndNew(false),_isCtrlNew(false)
 {
-	Q_ASSERT(start && end);
 	_name = QString("path%1").arg(QString::number(_id));
 	this->setStart(start);
 	this->setEnd(end);
 	this->setCtrl(ctrl);
-	this->setPos((start->pos().x() + end->pos().x()) / 2, (start->pos().y() + end->pos().y()) / 2);
+	if (_start && _end) {
+		this->setPos((start->pos().x() + end->pos().x()) / 2, (start->pos().y() + end->pos().y()) / 2);
+	}
 	this->setZValue(2);
 	setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);//设置不可移动
 }

@@ -14,24 +14,12 @@
 namespace basic {
 
 
-	//normal车型的相关信息
-	static SunnyTcsAgvCode vehicle_normal(VEHICLE_NORMAL_TYPE_ID, VEHICLE_NAGA_RUBBON, 3, ARG_INT32, E_ONE_DIMENSION ,QSTRING_GBK("普通车辆"));
-	static SunnyTcsAgvCode vehicle_mitsubishi(VEHICLE_MITSUBISHI_BATTERY_TYPE_ID, VEHICLE_NAGA_INERTIA | VEHICLE_NAGA_INERTIA, 7, ARG_INT32, E_TWO_DIMENSION,QSTRING_GBK("广汽三菱车辆"));
-	static SunnyTcsAgvCode vehicle_daimler_engine(VEHICLE_DAIMLER_ENGINE_TYPE_ID, VEHICLE_NAGA_RUBBON, 3, ARG_UINT32, E_ONE_DIMENSION, QSTRING_GBK("戴姆勒发动机车辆"));
+
 
 
 	class SUNNYTCSBASICV3_EXPORT SunnyTcsVehicle : public I_SunnyTcsAgvStat
 	{
-	public:
-		static bool initVehicleSupportedList() {
-			_vehicleSupported.append(vehicle_normal);
-			_vehicleSupported.append(vehicle_mitsubishi);
-			_vehicleSupported.append(vehicle_daimler_engine);
-			return true;
-		}
-
-		static QList<SunnyTcsAgvCode> _vehicleSupported;
-		static bool isInited;
+	
 		
 
 	public:

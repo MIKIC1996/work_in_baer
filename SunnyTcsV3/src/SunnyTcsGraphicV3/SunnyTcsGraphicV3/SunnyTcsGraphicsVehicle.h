@@ -30,9 +30,10 @@ public:
 	SunnyTcsGraphicsVehicle& operator=(const SunnyTcsGraphicsVehicle&) = delete;
 
 	//getter
-	qreal getLadarRadius()const { return _ladarRadius; }
+	qint32 getLadarRadius()const { return _ladarRadius; }
 	//setter
-	void setLadarRadius(qreal val) { _ladarRadius = val; }
+
+	void setLadarRadius(qint32 val) { _ladarRadius = val; }
 
 	// 通过 SunnyTcsMapGraphicItem 继承
 	virtual QRectF boundingRect() const override;
@@ -54,10 +55,11 @@ public:
 	virtual bool fromVehicleJson(QJsonObject& jobj) { return false; }
 	virtual QJsonObject toVehicleJson()const { return QJsonObject(); }
 
+
 protected:
 	const SunnyTcsGraphicsCoorSys* _cs;
 	const SunnyTcsMapAdjuster* _ad;
-	qreal _ladarRadius; //模拟雷达区大小
+	qint32 _ladarRadius; //模拟雷达区大小
 	
 
 

@@ -15,7 +15,7 @@ using namespace basic;
 
 //mapItem 的 超类
 //存在意义在于，保证所有的地图图形对象继承于此，就可以安全的进行dynamic_cast转换，从而调用特有的虚函数，知道图形是什么类型
-class SunnyTcsMapGraphicItem :public QGraphicsItem
+class SUNNYTCSGRAPHICV3_EXPORT SunnyTcsMapGraphicItem :public QGraphicsItem
 {
 public:
 	//ctor
@@ -45,7 +45,7 @@ public:
 	virtual QRectF boundingRect() const override = 0;
 	virtual void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = Q_NULLPTR) override = 0;
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;//限制在scene以内
-
+	
 
 	//下述两个函数，用以区分选取到的元素类型
 	virtual SunnyTcsMapObject_tag getItemTag()const = 0;
@@ -71,6 +71,16 @@ enum E_SunnyTcsModelEditStatus {
 class SunnyTcsMapAdjuster
 {
 public:
+
+	enum applyTargetType {
+		POINT = 1,
+		PATH =2,
+		LOCATION =3,
+		VEHICLE =4,
+		GROUP =5
+	};
+
+
 	
 	SunnyTcsMapAdjuster(qint32 wid, qint32 hei, qint32 resolution)
 		:_sceneWid(wid), _sceneHei(hei), _resolution(resolution), _status(E_EDIT),_groupIdCounter(0),
@@ -83,6 +93,12 @@ public:
 		else if (resolution > 100000) { //最大精度100m
 			_resolution = 100000;
 		}
+		//插入一个值
+		_ptIdQueue.push(1);
+		_phIdQueue.push(1);
+		_locIdQueue.push(1);
+		_veIdQueue.push(1);
+		_groupIdQueue.push(1);
 	}
 
 	//getter
@@ -102,61 +118,187 @@ public:
 		return _isTrackActived;
 	}
 
-	//获取ID
-	qint32 nextGroupId() const{
-		if (!_groupIdQueue.empty()) {
-			qint32 top = _groupIdQueue.top();
-			_groupIdQueue.pop();
-			return top;
-		}
-		return ++_groupIdCounter;
+
+	//补充ID
+	void supplyGroupQueueId( )const {
+		supplyQueueId(GROUP);
 	}
 
-	qint32 nextPtId()const {
-		if (!_ptIdQueue.empty()) {
-			qint32 top = _ptIdQueue.top();
-			_ptIdQueue.pop();
-			return top;
+	void supplyPtQueueId()const {
+		supplyQueueId(POINT);
+	}
+
+	void supplyPathQueueId()const {
+		supplyQueueId(PATH);
+	}
+
+
+	void supplyLocQueueId()const {
+		supplyQueueId(LOCATION);
+	}
+
+
+	void supplyVeQueueId()const {
+		supplyQueueId(VEHICLE);
+	}
+
+
+	void supplyQueueId(applyTargetType type)const {
+		std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>>* que = &_ptIdQueue;
+		switch (type)
+		{
+		case SunnyTcsMapAdjuster::POINT:
+			que = &_ptIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::PATH:
+			que = &_phIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::LOCATION:
+			que = &_locIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::VEHICLE:
+			que = &_veIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::GROUP:
+			que = &_groupIdQueue;
+			break;
+		default:
+			Q_ASSERT(0);
+			break;
 		}
-		return ++_ptIdCounter;
+
+		if (que->empty()) {
+			que->push(1);
+			que->push(2);
+		}
+		else if (que->size() == 1) {
+			que->push(que->top() + 1);
+		}
+		
+	}
+
+
+
+
+	//申请ID
+	bool applyForQueueId(applyTargetType type, qint32 id) const{
+		Q_ASSERT(id > 0);
+		supplyQueueId(type);
+		std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>>* que = &_ptIdQueue;
+		switch (type)
+		{
+		case SunnyTcsMapAdjuster::POINT:
+			que = &_ptIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::PATH:
+			que = &_phIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::LOCATION:
+			que = &_locIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::VEHICLE:
+			que = &_veIdQueue;
+			break;
+		case SunnyTcsMapAdjuster::GROUP:
+			que = &_groupIdQueue;
+			break;
+		default:
+			Q_ASSERT(0);
+			break;
+		}
+		std::priority_queue<qint32, std::vector<qint32>, std::greater<qint32>> temp;
+		bool finded = false;
+		qint32 topVal = 0;
+		while (que->size() > 0) {
+			topVal = que->top();
+			if (topVal != id) {
+				temp.push(topVal);
+			}
+			else {
+				finded = true;
+				if (que->size() == 1) {
+					//已经是最后一个了，必须先补充下
+					supplyQueueId(type);
+				}
+			}
+			que->pop();
+		}
+		*que = temp;
+
+		if (!finded) {	//现存中没找到目标
+			if (topVal >= id) {
+				return false;
+			}
+
+			while (topVal <= id) {
+				++topVal; //自增 1
+				if (topVal != id) {
+					que->push(topVal);
+				}
+			}
+		}
+		return true;
+	}
+
+	bool applyForGroupId(qint32 id) const {
+		return applyForQueueId(GROUP, id);
+	}
+
+	bool applyForPtId(qint32 id) const {
+		return applyForQueueId(POINT, id);
+	}
+
+	bool applyForPathId(qint32 id) const {
+		return applyForQueueId(PATH,id);
+	}
+
+
+	bool applyForLocId(qint32 id) const {
+		return applyForQueueId(LOCATION, id);
+	}
+
+	bool applyForVeId(qint32 id) const {
+		return applyForQueueId(VEHICLE, id);
+	}
+
+
+	//获取ID
+	qint32 nextGroupId() const{
+		supplyGroupQueueId();
+		qint32 ret = _groupIdQueue.top();
+		_groupIdQueue.pop();
+		return ret;
+	}
+
+
+	qint32 nextPtId()const {
+		supplyPtQueueId();
+		qint32 ret = _ptIdQueue.top();
+		_ptIdQueue.pop();
+		qDebug() << "next pt id is " << ret;
+		return ret;
 	}
 
 	qint32 nextPhId()const {
-		if (!_phIdQueue.empty()) {
-			qint32 top = _phIdQueue.top();
-			_phIdQueue.pop();
-			return top;
-		}
-		return ++_phIdCounter;
+		supplyPathQueueId();
+		qint32 ret = _phIdQueue.top();
+		_phIdQueue.pop();
+		return ret;
 	}
 
 	qint32 nextLocId()const {
-		if (!_locIdQueue.empty()) {
-			qint32 top = _locIdQueue.top();
-			_locIdQueue.pop();
-			return top;
-		}
-		return ++_locIdCounter;
+		supplyLocQueueId();
+		qint32 ret = _locIdQueue.top();
+		_locIdQueue.pop();
+		return ret;
 	}
 
 	qint32 nextVeId() const {
-		if (!_veIdQueue.empty()) {
-			qint32 top = _veIdQueue.top();
-			_veIdQueue.pop();
-			return top;
-		}
-		return ++_veIdCounter;
+		supplyVeQueueId();
+		qint32 ret = _veIdQueue.top();
+		_veIdQueue.pop();
+		return ret;
 	}
-
-	bool isAutoTrafficControlOpen()const { return _isAutoTrafficControlOpen; }
-	E_SunnyTcsModelEditStatus getEditStatus()const { return _status; }
-
-
-	//setter
-	void setIsTrackActived(bool is) { _isTrackActived = is; }
-
-	void setEditStatus(E_SunnyTcsModelEditStatus status) { _status = status; }
-	void setAutoTrafficControlOpen(bool is) { _isAutoTrafficControlOpen = is; }
 
 	//归还ID
 	void returnGroupId(qint32 id)const {
@@ -179,9 +321,16 @@ public:
 		_veIdQueue.push(id);
 	}
 
+
+	bool isAutoTrafficControlOpen()const { return _isAutoTrafficControlOpen; }
+	E_SunnyTcsModelEditStatus getEditStatus()const { return _status; }
+
+	//setter
+	void setIsTrackActived(bool is) { _isTrackActived = is; }
+	void setEditStatus(E_SunnyTcsModelEditStatus status) { _status = status; }
+	void setAutoTrafficControlOpen(bool is) { _isAutoTrafficControlOpen = is; }
+
 	
-
-
 	
 	//地图宽高 区块分辨率
 	qint32 _sceneWid;		//scene 宽

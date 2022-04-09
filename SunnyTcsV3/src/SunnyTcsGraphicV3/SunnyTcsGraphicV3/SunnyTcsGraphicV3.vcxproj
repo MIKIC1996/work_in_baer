@@ -97,21 +97,27 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="SunnyTcsGraphicsCoorSys.h" />
+    <ClInclude Include="SunnyTcsGraphicsCraft.h" />
+    <ClInclude Include="SunnyTcsGraphicsCraftGeneral.h" />
     <ClInclude Include="SunnyTcsGraphicsLocation.h" />
     <ClInclude Include="SunnyTcsGraphicsMapGeneral.h" />
     <ClInclude Include="SunnyTcsGraphicsModel.h" />
     <ClInclude Include="SunnyTcsGraphicsPath.h" />
     <ClInclude Include="SunnyTcsGraphicsPoint.h" />
+    <ClInclude Include="SunnyTcsGraphicsSonCraft.h" />
     <ClInclude Include="SunnyTcsGraphicsVehicle.h" />
     <ClInclude Include="SunnyTcsGraphicsVehicleLib.h" />
     <ClInclude Include="sunnytcsgraphicv3_global.h" />
     <ClInclude Include="SunnyTcsGraphicV3.h" />
     <ClCompile Include="SunnyTcsGraphicsCoorSys.cpp" />
+    <ClCompile Include="SunnyTcsGraphicsCraft.cpp" />
+    <ClCompile Include="SunnyTcsGraphicsCraftGeneral.cpp" />
     <ClCompile Include="SunnyTcsGraphicsLocation.cpp" />
     <ClCompile Include="SunnyTcsGraphicsMapGeneral.cpp" />
     <ClCompile Include="SunnyTcsGraphicsModel.cpp" />
     <ClCompile Include="SunnyTcsGraphicsPath.cpp" />
     <ClCompile Include="SunnyTcsGraphicsPoint.cpp" />
+    <ClCompile Include="SunnyTcsGraphicsSonCraft.cpp" />
     <ClCompile Include="SunnyTcsGraphicsVehicle.cpp" />
     <ClCompile Include="SunnyTcsGraphicsVehicleLib.cpp" />
     <ClCompile Include="SunnyTcsGraphicV3.cpp" />

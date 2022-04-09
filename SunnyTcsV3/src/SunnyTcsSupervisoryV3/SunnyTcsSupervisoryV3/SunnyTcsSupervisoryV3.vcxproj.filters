@@ -67,8 +67,8 @@
     <ClCompile Include="SunnyTcsLocationEditWidget.cpp">
       <Filter>Source Files\general</Filter>
     </ClCompile>
-    <ClCompile Include="SunnyTcsActionTableWidget.cpp">
-      <Filter>Source Files\general</Filter>
+    <ClCompile Include="SunnyTcsLocAttributionEditWidget.cpp">
+      <Filter>Source Files\schedulePanel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,8 +87,8 @@
     <QtMoc Include="SunnyTcsLocationEditWidget.h">
       <Filter>Header Files\general</Filter>
     </QtMoc>
-    <QtMoc Include="SunnyTcsActionTableWidget.h">
-      <Filter>Header Files\general</Filter>
+    <QtMoc Include="SunnyTcsLocAttributionEditWidget.h">
+      <Filter>Header Files\schedulePanel</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +96,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="SunnyTcsLocationEditWidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="SunnyTcsLocAttributionEditWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

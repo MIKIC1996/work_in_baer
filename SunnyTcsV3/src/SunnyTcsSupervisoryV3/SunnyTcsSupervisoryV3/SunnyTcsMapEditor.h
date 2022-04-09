@@ -4,6 +4,7 @@
 #include "ui_SunnyTcsMapEditor.h"
 #include "SunnyTcsSupervisoryV3_general.h"
 #include "SunnyTcsDockWidget.h"
+#include "SunnyTcsLocationEditWidget.h"
 
 
 class SunnyTcsTreeWidgetItem :public QTreeWidgetItem{
@@ -93,6 +94,7 @@ private:
 	void initLocationAttributionTable();
 	void initVehicleAttributionTable();
 	void initModelAttributionTable();
+
 	//连接信号与槽
 	void linkSignalsAndSlots();
 	//初始化动作
@@ -170,8 +172,11 @@ private slots :
 	
 
 	//工具栏
+	void onNewFileAcnTriggered();
 	void onSaveAcnTriggered();
 	void onCloseAcnTriggered();
+
+	void onSetBackImageAcnTriggered();
 
 	//坐标系函数
 	void onXAxisAcnTriggered();
@@ -195,8 +200,9 @@ private slots :
 
 	//属性编辑器
 	void onAttributeOkTbtnClicked();
-	
-
+	void onAttributeLocAddTbtnClicked();
+	void onAttributeLocDecTbtnClicked();
+	void onAttributeLocAcnEditClicked();
 	void onAttributeFlushClicked();//刷新
 
 private:
@@ -210,6 +216,7 @@ private:
 
 	//绘图面板相关
 	QButtonGroup* _paintTbtnGroup;
+
 	//移动触发
 	QHash<SunnyTcsMapGraphicItem*, QPointF> _startMovePosition;
 	QList<QGraphicsItem*> _currentSelected;
@@ -228,8 +235,10 @@ private:
 	//属性编辑器
 	SunnyTcsMapGraphicItem* _currentEditingItem = nullptr;
 
-
 	//状态栏
 	QCheckBox* _trackCbox;
+
+	//外部窗口
+	SunnyTcsLocationEditWidget* _locEditWidget  ;
 
 };

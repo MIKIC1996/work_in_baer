@@ -116,6 +116,7 @@
     <ClCompile Include="SunnyTcsPoint.cpp" />
     <ClCompile Include="SunnyTcsPreciseCondition.cpp" />
     <ClCompile Include="SunnyTcsSingleCondition.cpp" />
+    <ClCompile Include="SunnyTcsTypeArg.cpp" />
     <ClCompile Include="SunnyTcsUIDWorker.cpp" />
     <ClCompile Include="SunnyTcsVagueCondition.cpp" />
     <ClCompile Include="SunnyTcsVehicle.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="SunnyTcsPreciseCondition.h" />
     <ClInclude Include="SunnyTcsPromise.hpp" />
     <ClInclude Include="SunnyTcsSingleCondition.h" />
+    <ClInclude Include="SunnyTcsTypeArg.h" />
     <ClInclude Include="SunnyTcsUIDWorker.h" />
     <ClInclude Include="SunnyTcsVagueCondition.h" />
     <ClInclude Include="SunnyTcsVehicle.h" />

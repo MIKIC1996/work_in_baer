@@ -1,18 +1,20 @@
 #include "SunnyTcsMapEditor.h"
 
 
+
 SunnyTcsMapEditor::SunnyTcsMapEditor(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
 	_model = new SunnyTcsGraphicsModel(1, "unnamed",150000);
 	ui.graphicsView->setScene(_model);
-
 	init();
+
 // 	QWidget* lTitleBar = ui.dockWidget->titleBarWidget();
 // 	QWidget* lEmptyWidget = new SunnyTcsTitleBar(ui.dockWidget);
 // 	ui.dockWidget->setTitleBarWidget(lEmptyWidget);
 // 	delete lTitleBar;
+	_locEditWidget = new SunnyTcsLocationEditWidget(parent);
 }
 
 
@@ -38,6 +40,7 @@ void SunnyTcsMapEditor::updateObjectTreeWidget()
 
 void SunnyTcsMapEditor::addObjectInTreeWidget(const SunnyTcsMapGraphicItem* item)
 {
+	if (!item)return;
 	QTreeWidgetItem* treeBranch = nullptr;
 	SunnyTcsObjectTreeWidgetMapItem* newElement = nullptr;
 	switch (item->getItemTag()._eletype)
@@ -152,6 +155,11 @@ void SunnyTcsMapEditor::setCurrenctTreeItemInTreeWidget(const SunnyTcsMapGraphic
 
 
 
+/*
+* function: 初始化对象树，移除所有元素子项
+* param : void
+* return : void
+*/
 void SunnyTcsMapEditor::initObjectTreeWidget()
 {
 	QTreeWidgetItem* subLevelItem = nullptr;
@@ -168,10 +176,14 @@ void SunnyTcsMapEditor::initObjectTreeWidget()
 }
 
 
-
+/*
+* function: 根据对象类型显示 属性编辑窗口
+* param[1] : 图形对象指针
+* return : void
+*/
 void SunnyTcsMapEditor::updateAttribute(SunnyTcsMapGraphicItem * item)
 {
-	if (!item)return;
+	Q_ASSERT(item);//不允许传空指针
 	switch (item->getItemTag()._eletype)
 	{
 	case basic::Epoint:
@@ -187,15 +199,21 @@ void SunnyTcsMapEditor::updateAttribute(SunnyTcsMapGraphicItem * item)
 		updateAttribute(dynamic_cast<SunnyTcsGraphicsVehicle*>(item));
 		break;
 	default:
+		Q_ASSERT(0);//不支持的类型
 		return;
 	}
 	_currentEditingItem = item;
 }
 
 
-
+/*
+* function: 显示车属性编辑窗口，并将相关数据填入
+* param[1] : 图形车对象指针
+* return : void
+*/
 void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsVehicle * item)
 {
+	Q_ASSERT(item);
 	ui.attributeStackWid->setCurrentIndex(3);
 	ui.vehicleTableWidget->item(0, 1)->setText(item->getName());
 	ui.vehicleTableWidget->item(1, 1)->setText(item->getVehicleIp());
@@ -205,9 +223,14 @@ void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsVehicle * item)
 }
 
 
-
+/*
+* function: 显示点属性编辑窗口，并将相关数据填入
+* param[1] : 图形点对象指针
+* return : void
+*/
 void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsPoint * item)
 {
+	Q_ASSERT(item);
 	ui.attributeStackWid->setCurrentIndex(0);
 	SunnyTcsAgvCoordinate&& rxy = item->getPointCoor();
 	ui.pointTableWidget->item(0, 1)->setText(item->getName());
@@ -226,16 +249,20 @@ void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsPoint * item)
 }
 
 
-
+/*
+* function: 显示路径属性编辑窗口，并将相关数据填入
+* param[1] : 图形路径对象指针
+* return : void
+*/
 void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsPath * item)
 {
+	Q_ASSERT(item);
 	QString startName = dynamic_cast<const SunnyTcsGraphicsPoint*>(item->getStart())->getName();
 	QString endName = dynamic_cast<const SunnyTcsGraphicsPoint*>(item->getEnd())->getName();
 	QString ctrlName;
 	if (item->getCtrl()) {
 		ctrlName = dynamic_cast<const SunnyTcsGraphicsPoint*>(item->getCtrl())->getName();
 	}
-	Q_ASSERT(item);
 	ui.attributeStackWid->setCurrentIndex(1);
 	ui.pathTableWidget->item(0, 1)->setText(item->getName());
 	QComboBox* cbox = nullptr;
@@ -274,53 +301,132 @@ void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsPath * item)
 	}
 }
 
+
+/*
+* function: 显示工位属性编辑窗口，并将相关数据填入
+* param[1] : 图形工位对象指针
+* return : void
+*/
 void SunnyTcsMapEditor::updateAttribute(SunnyTcsGraphicsLocation * item)
 {
+	Q_ASSERT(item);
+	QVector<E_ARG_TYPE> sptParams = item->getParamsType();
+	qint32 sptParamsCount = sptParams.count();
+	qint32 paramRowCount = ui.locationTableWidget->rowCount()-2;
+	while ( paramRowCount < sptParamsCount) {
+		ui.locationTableWidget->setRowCount(ui.locationTableWidget->rowCount() + 1);
+		ui.locationTableWidget->setItem(ui.locationTableWidget->rowCount() - 1, 0,
+			new QTableWidgetItem( QSTRING_GBK("参数%1").arg( QString::number( ui.locationTableWidget->rowCount() - 2) ) ));
+		QComboBox* cbox = new QComboBox(this);
+		for (auto typeDecp : SunnyTcsAction::supportArgTyps.values()) {
+			cbox->addItem(typeDecp);
+		}
+		ui.locationTableWidget->setCellWidget(ui.locationTableWidget->rowCount() - 1, 1, cbox);
+		++paramRowCount;
+	}
+
+	while (paramRowCount > sptParamsCount) {
+		delete ui.locationTableWidget->item(ui.locationTableWidget->rowCount() - 1, 0);
+		delete qobject_cast<QComboBox*>(ui.locationTableWidget->cellWidget(ui.locationTableWidget->rowCount() - 1, 1));
+		ui.locationTableWidget->setRowCount(ui.locationTableWidget->rowCount() - 1);
+		--paramRowCount;
+	}
+
+	int startIndex = 2;
+	for (E_ARG_TYPE ty : sptParams) {
+		qint32 tarIndex = SunnyTcsAction::supportArgTyps.keys().indexOf(ty);
+		qobject_cast<QComboBox*>(ui.locationTableWidget->cellWidget(startIndex, 1))->setCurrentIndex(tarIndex);
+		++startIndex;
+	}
+
 	ui.attributeStackWid->setCurrentIndex(2);
 	ui.locationTableWidget->item(0, 1)->setText(item->getName());
 	const SunnyTcsGraphicsPoint* lpt = dynamic_cast<const SunnyTcsGraphicsPoint*>(item->getLinkPointPtr());
-	Q_ASSERT(lpt);
+	Q_ASSERT(lpt); // 不允许出现没有关联点的工位
 	QComboBox* cbox = dynamic_cast<QComboBox*>(ui.locationTableWidget->cellWidget(1, 1));
-	Q_ASSERT(cbox);
+	Q_ASSERT(cbox); //表项错误会导致该中断
 	for (int i = 0; i < cbox->count(); ++i) {
 		if (cbox->itemText(i) == lpt->getName()) {
 			cbox->setCurrentIndex(i);
 			return;
 		}
 	}
-	Q_ASSERT(0);
+	Q_ASSERT(0); //没有从Cbox中找到符合的点项，说明cbox与点的同步有问题
 }
 
+
+/*
+* function: 显示模型属性编辑窗口，并将相关数据填入
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::updateModelAttribute()
 {
+	if (!_model)return; // 如果模型不存在，则返回，不中断
 	ui.attributeStackWid->setCurrentIndex(4);
 	ui.modelTableWidget->item(0, 1)->setText(_model->getName());
 	ui.modelTableWidget->item(1, 1)->setText(QString::number(_model->getWidth()));
 	ui.modelTableWidget->item(2, 1)->setText(QString::number(_model->getHeight()));
 	ui.modelTableWidget->item(3, 1)->setText(QString::number(_model->getResolution()));
 	QComboBox* cbox = qobject_cast<QComboBox*>(ui.modelTableWidget->cellWidget(4, 1));
+	Q_ASSERT(cbox);
 	cbox->setCurrentIndex(_model->isAutoTrafficControlOpen() ? 0 : 1);
 	_currentEditingItem = nullptr;
 }
 
+
+
+/*
+* function: 预留
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::updatePointsGroupAttribute()
 {
 }
 
+
+/*
+* function: 预留
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::updatePathsGroupAttribute()
 {
 }
 
+
+/*
+* function: 预留
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::updateLocationGroupAttribute()
 {
 }
 
+
+/*
+* function: 预留
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::setModel(const QJsonObject & mapJson)
 {
 }
 
+
+/*
+* function: 设置一个新模型
+* param[1] : 新模型指针，该函数并不负责 模型的json反序列化;
+* return : void
+*/
 void SunnyTcsMapEditor::setModel(SunnyTcsGraphicsModel * model)
 {
+	if (_model) { //当前模型存在，则将当前模型移除
+		removeCurrentModel();
+	}
+	_model = model;
 	ui.graphicsView->setScene(_model);
 	const QHash<qint32, SunnyTcsGraphicsPoint*>& pts = _model->getPoints();
 	for (auto ptr : pts) {
@@ -341,20 +447,37 @@ void SunnyTcsMapEditor::setModel(SunnyTcsGraphicsModel * model)
 	enableAllButtion();
 	ui.menuBar->setEnabled(true);//菜单栏 
 	ui.mainToolBar->setEnabled(true);//工具栏
+	updatePointInfoWhenEditPoint();
+	_model->update();
 }
 
+
+/*
+* function: 将当前的模型移除，无需释放该模型，但是要清空界面上的数据，还有禁用所有的工具按钮
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::removeCurrentModel()
 {
 	ui.graphicsView->setScene(nullptr);
-	disableAllButtion();
-
-	ui.menuBar->setEnabled(false);//菜单栏 
-	ui.mainToolBar->setEnabled(false);//工具栏
-	
-	initObjectTreeWidget();
+	disableAllButtion(); //禁用绘图按钮
+	ui.menuBar->setEnabled(false);//菜单栏 禁用
+	ui.mainToolBar->setEnabled(false);//工具栏 禁用
+	initObjectTreeWidget(); //初始化对象树
+	ui.attributeStackWid->setCurrentIndex(5);//属性窗设置到空页
+	_currentEditingItem = nullptr;
+	//清空所有的撤销重做缓存
+	_operations.clear();
+	_tempOperations.clear();
 }
 
 
+
+/*
+* function: 初始化UI
+* param[1] : void
+* return : void
+*/
 void SunnyTcsMapEditor::initUi()
 {
 	//主视图
@@ -364,8 +487,8 @@ void SunnyTcsMapEditor::initUi()
 	SunnyTcsGraphicsVehicle_normal::setImage(":/resource/res/image/agvNormal.png");
 	SunnyTcsGraphicsVehicle_normal::setImageSelected(":/resource/res/image/agvNormal_select.png");
 
-	SunnyTcsGraphicsVehicle_mitsubishi_battery::setImage(":/resource/res/image/agvNormal.png");
-	SunnyTcsGraphicsVehicle_mitsubishi_battery::setImageSelected(":/resource/res/image/agvNormal_select.png");
+	SunnyTcsGraphicsVehicle_mitsubishi_battery::setImage(":/resource/res/image/agvMitshubishi.png");
+	SunnyTcsGraphicsVehicle_mitsubishi_battery::setImageSelected(":/resource/res/image/agvMitshubishi_selected.png");
 
 	SunnyTcsGraphicsVehicle_daimler_engine::setImage(":/resource/res/image/agvMitsubishiBattery.png");
 	SunnyTcsGraphicsVehicle_daimler_engine::setImageSelected(":/resource/res/image/agvMitsubishiBattery_selected.png");
@@ -391,13 +514,12 @@ void SunnyTcsMapEditor::initUi()
 
 	//菜单栏
 	//工具
-	_paintVehicleMenu = new QMenu(this);//添加agv
-	for (auto iter : SunnyTcsVehicle::_vehicleSupported) {
-		QAction* acn = ui.menuAddVehicleMenu->addAction(iter._description);
+	_paintVehicleMenu = new QMenu(this);//添加所支持的 agv类型 到menu中，这个menu又关联到了绘图工具和菜单栏中
+	for (auto iter : I_SunnyTcsVehicleFactory::_vehicleSupported) { //支持的AGV类型信息存放在 类I_SunnyTcsVehicleFactory 静态全局变量中
+		QAction* acn = ui.menuAddVehicleMenu->addAction(iter._description); //只要获取其描述信息即可
 		_paintVehicleMenu->addAction(acn);
 		_menuAddVehicleAcnList.append(acn);
 	}
-
 	//视图
 	
 
@@ -417,38 +539,36 @@ void SunnyTcsMapEditor::initUi()
 	ui.objectTreeWid->horizontalScrollBar()->hide();
 
 	//属性表
-	initPointAttributionTable();
+	initPointAttributionTable(); //初始化相关表
 	initPathAttributionTable();
 	initLocationAttributionTable();
 	initVehicleAttributionTable();
 	initModelAttributionTable();
 
 	//状态栏初始化
-	ui.statusBar->showMessage("haha");
 	_trackCbox = new QCheckBox(ui.statusBar);
 	_trackCbox->setStyleSheet(" QCheckBox{color : rgb(255,255,255); } ");
 	_trackCbox->setText(QSTRING_GBK( "区块点跟踪   "));
 	ui.statusBar->addPermanentWidget(_trackCbox);
-	//ui.statusBar->addWidget(new QCheckBox(ui.statusBar));
-	//ui.statusBar->addWidget(new QLabel(ui.statusBar));
-	//ui.statusBar->addWidget(new QComboBox(ui.statusBar));
 
 	//设置样式表
 	QFile file(":/resource/res/qss/editor.qss");
 	file.open(QIODevice::ReadOnly);
 	this->setStyleSheet(file.readAll());
+	file.close();
 	setDockNestingEnabled(true);
-	
-
-
 }
 
 
+/*
+	function:对点属性表进行初始化
+	param[1] : void;
+	return : void;
+*/
 void SunnyTcsMapEditor::initPointAttributionTable()
 {
 	ui.pointTableWidget->verticalScrollBar()->hide();
 	ui.pointTableWidget->horizontalScrollBar()->hide();
-
 	ui.pointTableWidget->horizontalHeader()->setHidden(false);
 	ui.pointTableWidget->verticalHeader()->setHidden(false);
 	QTableWidgetItem* item = new QTableWidgetItem("");
@@ -485,6 +605,13 @@ void SunnyTcsMapEditor::initPointAttributionTable()
 
 }
 
+
+
+/*
+function:对路径属性表进行初始化
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::initPathAttributionTable()
 {
 	ui.pathTableWidget->verticalScrollBar()->hide();
@@ -518,6 +645,12 @@ void SunnyTcsMapEditor::initPathAttributionTable()
 	ui.pathTableWidget->setCellWidget(10, 1, ctrlPts);
 }
 
+
+/*
+function:对工位属性表进行初始化
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::initLocationAttributionTable()
 {
 	ui.locationTableWidget->verticalScrollBar()->hide();
@@ -532,6 +665,12 @@ void SunnyTcsMapEditor::initLocationAttributionTable()
 	ui.locationTableWidget->setCellWidget(1, 1, pts);
 }
 
+
+/*
+function:对车辆属性表进行初始化
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::initVehicleAttributionTable()
 {
 	ui.vehicleTableWidget->verticalScrollBar()->hide();
@@ -547,6 +686,12 @@ void SunnyTcsMapEditor::initVehicleAttributionTable()
 	ui.vehicleTableWidget->setItem(4, 1, new QTableWidgetItem(""));
 }
 
+
+/*
+function:对模型属性表进行初始化
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::initModelAttributionTable()
 {
 	ui.modelTableWidget->verticalScrollBar()->hide();
@@ -566,6 +711,11 @@ void SunnyTcsMapEditor::initModelAttributionTable()
 }
 
 
+/*
+function:初始化连接信号
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::linkSignalsAndSlots()
 {
 	//graphics view鼠标信号
@@ -616,13 +766,14 @@ void SunnyTcsMapEditor::linkSignalsAndSlots()
 	connect(ui.menuToolAntiSelectAcn, SIGNAL(triggered()), this, SLOT(onMenuToolAntiSelectAcnTriggered()));
 	connect(ui.menuToolMoveAcn, SIGNAL(triggered()), this, SLOT(onMenuToolMoveAcnTriggered()));
 	connect(ui.menuToolMoveCsAcn, SIGNAL(triggered()), this, SLOT(onMenuToolMoveCsAcnTriggered()));
-
 	//选择选项
 
 
 	//工具栏信号
+	connect(ui.newFileAcn, SIGNAL(triggered()), this, SLOT(onNewFileAcnTriggered()));
 	connect(ui.closeAcn, SIGNAL(triggered()), this, SLOT(onCloseAcnTriggered()));
 	connect(ui.saveAcn, SIGNAL(triggered()), this, SLOT(onSaveAcnTriggered()));
+	connect(ui.setBackPixmapAcn, SIGNAL(triggered()), this, SLOT(onSetBackImageAcnTriggered() ));
 
 
 	//工具栏信号
@@ -650,17 +801,24 @@ void SunnyTcsMapEditor::linkSignalsAndSlots()
 	//属性编辑器
 	connect(ui.attributeOkTbtn, SIGNAL(clicked()), this, SLOT(onAttributeOkTbtnClicked()));
 	connect(ui.attributeFlushTbtn, SIGNAL(clicked()), this, SLOT(onAttributeFlushClicked()));
+	connect(ui.attributeLocAddTbtn, SIGNAL(clicked()), this, SLOT(onAttributeLocAddTbtnClicked()));
+	connect(ui.attributeLocDecTbtn, SIGNAL(clicked()), this, SLOT(onAttributeLocDecTbtnClicked()));
+	connect(ui.attributeLocAcnEditTbtn, SIGNAL(clicked()), this, SLOT(onAttributeLocAcnEditClicked()));
 }
 
 
-
+/*
+function: 初始化操作
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::initOperation()
 {
 	//绘图面板
 	onPaintDefaultTbtnClicked(); //启动时按默认按钮
 	//菜单栏
-	flushUndoRedoAcnEnable();//撤销重做初始化
-	//工具栏视图
+	flushUndoRedoAcnEnable();//撤销重做按钮初始化
+	//工具栏视图，dock窗口的显示和关闭
 	onMenuPanelPaintAcnTriggered();
 	onMenuPanelPaintAcnTriggered();
 	onMenuPanelAttributeAcnTriggered();
@@ -674,7 +832,11 @@ void SunnyTcsMapEditor::initOperation()
 }
 
 
-
+/*
+function: 关闭所有绘图按钮的使能，主要用于模型更换与绘制曲线过程中
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::disableAllButtion()
 {
 	//工具
@@ -693,7 +855,11 @@ void SunnyTcsMapEditor::disableAllButtion()
 }
 
 
-
+/*
+function: 使能所有绘图按钮
+param[1] : void;
+return : void;
+*/
 void SunnyTcsMapEditor::enableAllButtion()
 {
 	//工具
@@ -713,8 +879,14 @@ void SunnyTcsMapEditor::enableAllButtion()
 }
 
 
+/*
+function: 鼠标点击触发的 删除函数
+param[1] : 鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::removeItemWhenMousePressed(QPointF pt)
 {
+	Q_ASSERT(_model);//模型如果不存在，则不应该触发此函数，如果触发，说明按钮使能 没做好
 	//当前位置元素设置为选择
 	QGraphicsItem* item = _model->itemAt(pt, QTransform());
 	if (item) {
@@ -725,14 +897,25 @@ void SunnyTcsMapEditor::removeItemWhenMousePressed(QPointF pt)
 }
 
 
+/*
+function: 鼠标点击触发的 绘制选取函数
+param[1] :  鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::paintSelectAeraWhenMousePressed(QPointF pt)
 {
+	Q_ASSERT(_model); //模型如果不存在，则不应该触发此函数，如果触发，说明按钮使能 没做好
 	if (!_model->isSelecting()) {
 		_model->addSelectAera(SunnyTcsGraphicsSelectAera::ERect, pt);
 	}
 }
 
 
+/*
+	function: 鼠标点击触发的 绘制点函数
+	param[1] :  鼠标点击坐标
+	return : void;
+*/
 void SunnyTcsMapEditor::paintPointWhenMousePressed(QPointF pt)
 {
 	try
@@ -769,15 +952,25 @@ void SunnyTcsMapEditor::paintPointWhenMousePressed(QPointF pt)
 }
 
 
+/*
+	function: 鼠标点击触发的 绘制线函数
+	param[1] :  鼠标点击坐标
+	return : void;
+*/
 void SunnyTcsMapEditor::paintPathWhenMousePressed(QPointF pt)
 {
 	try {
 		SunnyTcsGraphicsPath* ptr = nullptr;
-		if (!_model->isPaintingPath()) {
+		if (!_model->isPaintingPath()) { //第一次点击
 			_model->addGraphicsPath(pt);
-			disableAllButtion();
+			
+			disableAllButtion();//按钮失能
+			ui.menuBar->setEnabled(false);//菜单栏 禁用
+			ui.mainToolBar->setEnabled(false);//工具栏 禁用
+			ui.objectDwid->setEnabled(false); //对象树窗口禁用
+			ui.attributeDwid->setEnabled(false); //属性窗口禁用
 		}
-		else {
+		else {//第二第三次点击
 			ptr = _model->updateTempPath(pt, ui.paint_dir_iline_tbrn->isChecked() ? false : true, 2);
 			if (!ptr)return;
 			this->addObjectInTreeWidget(ptr);
@@ -864,6 +1057,10 @@ void SunnyTcsMapEditor::paintPathWhenMousePressed(QPointF pt)
 			_operations.push(userOperation);
 			flushUndoRedoAcnEnable();
 			enableAllButtion();
+			ui.menuBar->setEnabled(true);//菜单栏 禁用
+			ui.mainToolBar->setEnabled(true);//工具栏 禁用
+			ui.objectDwid->setEnabled(true); //对象树窗口禁用
+			ui.attributeDwid->setEnabled(true); //属性窗口禁用
 		}
 	}
 	catch (SunnyTcsException<ERROR_GRAPHICS_PATH_OUT_SCENE>& e)
@@ -873,31 +1070,50 @@ void SunnyTcsMapEditor::paintPathWhenMousePressed(QPointF pt)
 }
 
 
+/*
+function: 鼠标点击触发的 绘制工位函数
+param[1] :  鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::paintLocationWhenMousePressed(QPointF pt)
 {
-	SunnyTcsGraphicsLocation* ptr = _model->addGraphicsLocation(pt);
-	if (ptr) this->addObjectInTreeWidget(ptr);
-
-	//将操作存入撤销重做缓存
-	updateTempUserOperationStack();
-	SunnyTcsUserInterfaceOperation userOperation(
-		[ptr, this]()->void {
-		this->_model->addGraphicsLocation(ptr);
+	try
+	{
+		SunnyTcsGraphicsLocation* ptr = _model->addGraphicsLocation(pt); //当前位置没有点会抛出异常
+		if (!ptr)return;
 		this->addObjectInTreeWidget(ptr);
-	},
-		[ptr, this]()->void {
-		this->_model->removeGraphicsLocation(ptr);
-		this->delObjectInTreeWidget(ptr);
-	},
-		[ptr, this]()->void {
-		delete ptr;
+
+		//将操作存入撤销重做缓存
+		updateTempUserOperationStack();
+		SunnyTcsUserInterfaceOperation userOperation(
+			[ptr, this]()->void {
+			this->_model->addGraphicsLocation(ptr);
+			this->addObjectInTreeWidget(ptr);
+		},
+			[ptr, this]()->void {
+			this->_model->removeGraphicsLocation(ptr);
+			this->delObjectInTreeWidget(ptr);
+		},
+			[ptr, this]()->void {
+			delete ptr;
+		}
+		);
+		_operations.push(userOperation);
+		flushUndoRedoAcnEnable();
 	}
-	);
-	_operations.push(userOperation);
-	flushUndoRedoAcnEnable();
+	catch (SunnyTcsException<ERROR_GRAPHICS_LOCATION_NO_LINK_POINT>& e)
+	{
+		ui.statusBar->showMessage(QSTRING_GBK(e.what()));
+	}
+	
 }
 
 
+/*
+function: 鼠标点击触发的 绘制车函数
+param[1] :  鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::paintVehicleWhenMousePressed(QPointF pt)
 {
 	SunnyTcsGraphicsVehicle* ptr = _model->addGraphicsVehicle(pt, _currentAgvCode);
@@ -923,6 +1139,11 @@ void SunnyTcsMapEditor::paintVehicleWhenMousePressed(QPointF pt)
 }
 
 
+/*
+function: 对点进行增加删除时，要重新更新属性表中 有关点的comboBox 信息
+param[1] :  鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::updatePointInfoWhenEditPoint()
 {
 	QList<SunnyTcsGraphicsPoint*> pts = _model->getPoints().values();
@@ -951,8 +1172,14 @@ void SunnyTcsMapEditor::updatePointInfoWhenEditPoint()
 
 
 
+/*
+function: 鼠标移动时触发的槽函数
+param[1] :  鼠标坐标
+return : void;
+*/
 void SunnyTcsMapEditor::onMouseMove(QPointF pt)
 {	
+	if (!_model)return; //无模型状态
 	//QPointF npt = _model->getTrackPoint(pt);
 	//QCursor::setPos(  ui.graphicsView->mapToGlobal(ui.graphicsView->mapFromScene(npt)));
 
@@ -971,14 +1198,14 @@ void SunnyTcsMapEditor::onMouseMove(QPointF pt)
 }
 
 
+/*
+function : 鼠标释放
+param[1] :  鼠标释放坐标
+return : void;
+*/
 void SunnyTcsMapEditor::onMouseRelease(QPointF pt)
 {
-	//qDebug() << "release ( " << pt.x() << " , " << pt.y() << " );";
-
-	if (_trackCbox->isChecked()) {
-		pt = _model->getTrackPoint(pt);
-	}
-
+	if (!_model)return; //无模型状态
 	if (ui.paint_move_tbtn->isChecked()||ui.paint_move_cs_tbtn->isChecked()) {
 		if (_startMovePosition.isEmpty())return;
 		SunnyTcsMapGraphicItem* firstItem = _startMovePosition.keys().at(0);
@@ -1035,9 +1262,15 @@ void SunnyTcsMapEditor::onMouseRelease(QPointF pt)
 }
 
 
-
+/*
+function : 鼠标点击
+param[1] :  鼠标点击坐标
+return : void;
+*/
 void SunnyTcsMapEditor::onMousePress(QPointF pt)
 {
+	if (!_model)return; //无模型状态
+
 	if (_trackCbox->isChecked()) {
 		pt = _model->getTrackPoint(pt);
 	}
@@ -1055,9 +1288,11 @@ void SunnyTcsMapEditor::onMousePress(QPointF pt)
 		QList<QGraphicsItem*> && selectedItems = _model->selectedItems();
 		if (!selectedItems.isEmpty()) {
 			_startMovePosition.clear();
-			for (auto ptr : selectedItems) {
-				_startMovePosition.insert(dynamic_cast<SunnyTcsMapGraphicItem*>(ptr), ptr->pos());
-			}
+		}
+		for (auto ptr : selectedItems) {
+			SunnyTcsMapGraphicItem* item = dynamic_cast<SunnyTcsMapGraphicItem*>(ptr);
+			Q_ASSERT(item); //不可能有不能转换为SunnyTcsMapGraphicItem的地图元素
+			_startMovePosition.insert(item , ptr->pos());
 		}
 	}
 	else if (ui.paint_delete_tbrn->isChecked()) {
@@ -1070,6 +1305,7 @@ void SunnyTcsMapEditor::onMousePress(QPointF pt)
 		for (auto ptr : _currentSelected) {
 			ptr->setSelected(true);
 		}
+		_model->update();
 		paintSelectAeraWhenMousePressed(pt);
 	}
 	else if (ui.paint_point_tbtn->isChecked()) {
@@ -1087,9 +1323,14 @@ void SunnyTcsMapEditor::onMousePress(QPointF pt)
 }
 
 
-
+/*
+function : 鼠标滚轮
+param[1] :  角度
+return : void;
+*/
 void SunnyTcsMapEditor::onWheelChange(int angle)
 {
+	if (!_model)return; //无模型状态
 	if (angle > 0) {
 		ui.graphicsView->scale(1.2, 1.2);
 	}
@@ -1099,93 +1340,167 @@ void SunnyTcsMapEditor::onWheelChange(int angle)
 }
 
 
-//QGraphicsItem::ItemIsMovable| QGraphicsItem::ItemIsSelectable| QGraphicsItem::ItemIsFocusable| QGraphicsItem::ItemSendsGeometryChanges
 
+/*
+function : 默认按钮槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintDefaultTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 选取按钮槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintSelectTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 取消选取按钮槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintCancelSelectTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected = _model->selectedItems();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 移动元素槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintMoveTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemSendsGeometryChanges);
 	_model->setItemFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable, Epath);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 移动坐标系槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintMoveCsTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(0);
 	_model->setItemFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemSendsGeometryChanges, Ecoorsys);
 }
 
+
+/*
+function : 删除槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintDeleteTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 绘制点槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintPointTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
+
+/*
+function : 绘制直线槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintDirPathTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
 
+/*
+function : 绘制曲线槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintArchPathTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
 
-
+/*
+function : 绘制工位槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintLocationTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
 
-
+/*
+function : 绘制车辆槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintVehicleTbtnClicked()
 {
+	Q_ASSERT(_model); // 没有模型的时候，按钮应该已经失能，不可能触发该函数
 	_currentSelected.clear();
 	_model->setItemFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 	_model->setItemFlags(0, Ecoorsys);
 }
 
 
-
+/*
+function :根据撤销与重做缓存的数量，使能或者失能撤销与重做按钮 
+param[1] :  void 
+return : void;   
+*/
 void SunnyTcsMapEditor::flushUndoRedoAcnEnable()
 {
 	_operations.isEmpty() ? ui.undoAcn->setEnabled(false) : ui.undoAcn->setEnabled(true);
@@ -1193,6 +1508,12 @@ void SunnyTcsMapEditor::flushUndoRedoAcnEnable()
 }
 
 
+
+/*
+function :撤销选项槽函数
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onUndoAcnTriggered()
 {
 	if (_operations.isEmpty()) {
@@ -1205,7 +1526,11 @@ void SunnyTcsMapEditor::onUndoAcnTriggered()
 }
 
 
-
+/*
+	function :重做选项槽函数
+	param[1] :  void
+	return : void;
+*/
 void SunnyTcsMapEditor::onRedoAcnTriggered()
 {
 	if (_tempOperations.isEmpty()) {
@@ -1218,7 +1543,11 @@ void SunnyTcsMapEditor::onRedoAcnTriggered()
 }
 
 
-
+/*
+	function :清空重做缓存
+	param[1] :  void
+	return : void;
+*/
 void SunnyTcsMapEditor::updateTempUserOperationStack()
 {
 	while (!_tempOperations.isEmpty()) {
@@ -1229,7 +1558,11 @@ void SunnyTcsMapEditor::updateTempUserOperationStack()
 }
 
 
-
+/*
+	function :菜单栏工具选项卡
+	param[1] :  void
+	return : void;
+*/
 void SunnyTcsMapEditor::onPaintPointAcnTriggered()
 {
 	ui.paint_point_tbtn->setChecked(true);
@@ -1237,7 +1570,11 @@ void SunnyTcsMapEditor::onPaintPointAcnTriggered()
 }
 
 
-
+/*
+function :菜单栏工具选项卡
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintDirLineAcnTriggered()
 {
 	ui.paint_dir_iline_tbrn->setChecked(true);
@@ -1245,7 +1582,11 @@ void SunnyTcsMapEditor::onPaintDirLineAcnTriggered()
 }
 
 
-
+/*
+function :菜单栏工具选项卡
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintArchLineAcnTriggered()
 {
 	ui.paint_arch_line_tbtn->setChecked(true);
@@ -1253,7 +1594,11 @@ void SunnyTcsMapEditor::onPaintArchLineAcnTriggered()
 }
 
 
-
+/*
+function :菜单栏工具选项卡
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onPaintLocationAcnTriggered()
 {
 	ui.paint_loc_tbtn->setChecked(true);
@@ -1261,7 +1606,11 @@ void SunnyTcsMapEditor::onPaintLocationAcnTriggered()
 }
 
 
-
+/*
+function :槽函数，删除选中项
+param[1] :  void
+return : void;
+*/
 void SunnyTcsMapEditor::onMenuDelSelectedAcnTriggered()
 {
 	QList<QGraphicsItem*>&& itemsSelected = _model->selectedItems();
@@ -1286,6 +1635,7 @@ void SunnyTcsMapEditor::onMenuDelSelectedAcnTriggered()
 	for (auto ptr : pts) {
 		item = dynamic_cast<SunnyTcsMapGraphicItem*>(ptr);
 		Q_ASSERT(item);
+		if (_model->checkIsPointUsedByPathOrLoc(ptr->getItemId()))continue;
 		_model->remiveGraphicsItems(item);
 		delObjectInTreeWidget(item);
 		updatePointInfoWhenEditPoint();
@@ -1311,7 +1661,14 @@ void SunnyTcsMapEditor::onMenuDelSelectedAcnTriggered()
 		}
 		updatePointInfoWhenEditPoint();
 	},
-		[]()->void {
+		[removedItems]()->void {
+		/*
+		qDebug() << "++++++++++++++++++++++++++++++++++++++++++++++++";
+		for (auto ptr : removedItems) {
+			qDebug() << "++++++++++++++++++++++++++++++++++++++++++++++++";
+			delete ptr;
+		}
+		*/
 	}
 	);
 	_operations.push(userOperation);
@@ -1328,7 +1685,7 @@ void SunnyTcsMapEditor::onMenuAddVehicleAcnTriggered()
 {
 	for (int i = 0; i < _menuAddVehicleAcnList.count(); ++i) {
 		if (sender() == _menuAddVehicleAcnList.at(i)) {
-			_currentAgvCode = SunnyTcsVehicle::_vehicleSupported.at(i);
+			_currentAgvCode = I_SunnyTcsVehicleFactory::_vehicleSupported.values().at(i);
 			ui.paint_vehicle_tbtn->setChecked(true);
 			break;
 		}
@@ -1412,14 +1769,49 @@ void SunnyTcsMapEditor::onMenuPanelGroupAcnTriggered()
 
 
 
+void SunnyTcsMapEditor::onNewFileAcnTriggered()
+{
+	QString path = QFileDialog::getOpenFileName(this);
+	QFile file(path);
+	if (!file.exists() || !file.open(QFile::ReadOnly | QFile::Text)) {
+		QMessageBox::information(this, "info", "open error");
+	}
+	QJsonDocument jdoc = QJsonDocument::fromJson(file.readAll());
+	QJsonObject jobj = jdoc.object();
+	SunnyTcsGraphicsModel* model = new SunnyTcsGraphicsModel(1, "");
+	QString err;
+	if (!model->fromJson(jobj, err)) {
+		ui.statusBar->showMessage(err);
+		return;
+	}
+	
+	this->setModel(model);
+}
+
 void SunnyTcsMapEditor::onSaveAcnTriggered()
 {
-	setModel(_model);
+	QString path = QFileDialog::getSaveFileName(this);
+	QFile file(path);
+	if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
+		QMessageBox::information(this, tr("提示"), "save error");
+	}
+
+	QJsonDocument jdoc(_model->toJson());
+	file.write(jdoc.toJson());
+	
 }
+
+
 
 void SunnyTcsMapEditor::onCloseAcnTriggered()
 {
 	removeCurrentModel();
+}
+
+void SunnyTcsMapEditor::onSetBackImageAcnTriggered()
+{
+	QString path =  QFileDialog::getOpenFileName(this);
+	 _model->setImagePath(path);
 }
 
 void SunnyTcsMapEditor::onXAxisAcnTriggered()
@@ -1673,13 +2065,18 @@ void SunnyTcsMapEditor::onObjectTreeWidItemPressed(QTreeWidgetItem * item, int c
 }
 
 
-
+/*
+	function: 对象树当前项 变化时 触发的槽函数，主要是更新属性编辑窗口，使其与对象数当前项保持一致;
+	param[1] : 当前项;
+	param[2] : 之前的项，在这里没有用;
+	return : void;
+*/
 void SunnyTcsMapEditor::onObjectTreeWidCurrentItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous)
 {
 	if (!current)return;
 	_model->setAllItemSelected(false);
 	SunnyTcsObjectTreeWidgetMapItem* cur = dynamic_cast<SunnyTcsObjectTreeWidgetMapItem*> (current);
-	if (!cur) {
+	if (!cur) { //所选的子项并不是地图图形元素，就将属性窗口设置到 模型那一页
 		updateModelAttribute();
 		return;
 	}
@@ -1751,6 +2148,56 @@ void SunnyTcsMapEditor::onAttributeOkTbtnClicked()
 	catch (const QString err) {
 		QMessageBox::information(this, QSTRING_GBK("提示"), err);
 	}
+}
+
+void SunnyTcsMapEditor::onAttributeLocAddTbtnClicked()
+{
+	try
+	{
+		qint32 paramRowCount = ui.locationTableWidget->rowCount() - 2;
+		if (paramRowCount >= SunnyTcsAction::action_params_count)throw QSTRING_GBK("超过参数的最大支持数");
+		ui.locationTableWidget->setRowCount(ui.locationTableWidget->rowCount() + 1);
+		ui.locationTableWidget->setItem(ui.locationTableWidget->rowCount() - 1, 0,
+			new QTableWidgetItem(QSTRING_GBK("参数%1").arg(QString::number(ui.locationTableWidget->rowCount() - 2))));
+		QComboBox* cbox = new QComboBox(this);
+		for (auto typeDecp : SunnyTcsAction::supportArgTyps.values()) {
+			cbox->addItem(typeDecp);
+		}
+		ui.locationTableWidget->setCellWidget(ui.locationTableWidget->rowCount() - 1, 1, cbox);
+	}
+	catch (QString& e)
+	{
+		ui.statusBar->showMessage(e);
+	}
+	
+}
+
+void SunnyTcsMapEditor::onAttributeLocDecTbtnClicked()
+{
+	try
+	{
+		qint32 paramRowCount = ui.locationTableWidget->rowCount() - 2;
+		if (paramRowCount <= 1)throw QSTRING_GBK("参数数量不能小于1个");
+		delete ui.locationTableWidget->item(ui.locationTableWidget->rowCount() - 1, 0);
+		delete qobject_cast<QComboBox*>(ui.locationTableWidget->cellWidget(ui.locationTableWidget->rowCount() - 1, 1));
+		ui.locationTableWidget->setRowCount(ui.locationTableWidget->rowCount() - 1);
+	}
+	catch (QString& e)
+	{
+		ui.statusBar->showMessage(e);
+	}
+}
+
+void SunnyTcsMapEditor::onAttributeLocAcnEditClicked()
+{
+	SunnyTcsGraphicsLocation* loc = dynamic_cast<SunnyTcsGraphicsLocation*>(_currentEditingItem);
+	if (loc) {
+		
+		_locEditWidget->show();
+		_locEditWidget->init(loc);
+	}
+	
+
 }
 
 
@@ -1961,6 +2408,7 @@ void SunnyTcsMapEditor::setLocationAttribution()
 		//记录旧值
 		QString ordName = item->getName();
 		const SunnyTcsGraphicsPoint* ordPt = dynamic_cast<const SunnyTcsGraphicsPoint*> (item->getLinkPointPtr());
+		QVector<E_ARG_TYPE> ordArgTYpe = item->getParamsType();
 
 		//获取新值
 		QString name = ui.locationTableWidget->item(0, 1)->text();
@@ -1971,22 +2419,31 @@ void SunnyTcsMapEditor::setLocationAttribution()
 		auto iter = std::find_if(pts.begin(), pts.end(), [&newPtName](SunnyTcsGraphicsPoint* ptr)->bool {return ptr->getName() == newPtName; });
 		Q_ASSERT(iter != pts.end());
 		SunnyTcsGraphicsPoint* ptPtr = *iter;
+		QVector<E_ARG_TYPE> argTypes;
+		for (int i = 2; i < ui.locationTableWidget->rowCount(); ++i) {
+			qint32 index = qobject_cast<QComboBox*>(ui.locationTableWidget->cellWidget(i, 1))->currentIndex();
+			E_ARG_TYPE argType = SunnyTcsAction::supportArgTyps.keys().at(index);
+			argTypes << argType;
+		}
 
 		//设置新置
 		item->SetName(name);
 		item->bindLinkPt(ptPtr);
+		item->setParamsType(argTypes);
 
 		//更新撤销重做缓存
 		updateTempUserOperationStack();
 		SunnyTcsUserInterfaceOperation userOperation(
-			[name,ptPtr,this,item]()->void {
+			[name,ptPtr,this,item, argTypes]()->void {
 			item->SetName(name);
 			item->bindLinkPt(ptPtr);
+			item->setParamsType(argTypes);
 			this->setCurrenctTreeItemInTreeWidget(item);
 		},
-			[ordName,ordPt,this,item]()->void {
+			[ordName,ordPt,this,item,ordArgTYpe]()->void {
 			item->SetName(ordName);
 			item->bindLinkPt(ordPt);
+			item->setParamsType(ordArgTYpe);
 			this->setCurrenctTreeItemInTreeWidget(item);
 		},
 			[this]()->void {}
@@ -2013,13 +2470,13 @@ void SunnyTcsMapEditor::setVehicleAttribution()
 		QString ordName = item->getName();
 		QString ordIp = item->getVehicleIp();
 		qint16 ordPort = item->getVehiclePort();
-		qreal ordLadarRadius = item->getLadarRadius();
+		qint32 ordLadarRadius = item->getLadarRadius();
 
 		//新值
 		QString name = ui.vehicleTableWidget->item(0, 1)->text();
 		QString ip = ui.vehicleTableWidget->item(1, 1)->text();
 		quint16 port = ui.vehicleTableWidget->item(2, 1)->text().toInt();
-		qreal ladarRadius = ui.vehicleTableWidget->item(4, 1)->text().toDouble();
+		qint32 ladarRadius = ui.vehicleTableWidget->item(4, 1)->text().toInt();
 
 		//设置新值
 		item->SetName(name);

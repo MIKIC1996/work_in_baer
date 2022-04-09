@@ -44,14 +44,73 @@ public:
 	virtual SunnyTcsMapObject_tag getItemTag() const override;
 
 	// 通过 SunnyTcsLocation 继承
-	virtual bool fromJson(QJsonObject& jobj) override
+	virtual bool fromJson(QJsonObject& jobj, const QHash<qint32, SunnyTcsPoint*>& pts) override
 	{
-		return false; 
+		if (!jobj.contains(JSON_MAP_LOC_ID) ||
+			!jobj.contains(JSON_MAP_LOC_NAME) ||
+			!jobj.contains(JSON_MAP_LOC_LINK_PT)||
+			!jobj.contains(JSON_MAP_LOC_ACTIONS)||
+			!jobj.contains(JSON_MAP_LOC_SCENE_X)||
+			!jobj.contains(JSON_MAP_LOC_SCENE_Y)
+			) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_FROM_JSON_NO_TAG>::err_info_cn);
+			return false;
+		}
+		qint32 id = jobj[JSON_MAP_LOC_ID].toInt();
+		if (id != _id) {
+			if (_ad->applyForLocId(id)) {
+				_ad->returnLocId(_id);
+			}
+			else {
+				throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR>::err_info_cn)
+					+ QSTRING_GBK(": location apply id %1").arg(QString::number(id));
+				return false;
+			}
+		}
+		
+		QString name = jobj[JSON_MAP_LOC_NAME].toString();
+		qint32 lkPtId = jobj[JSON_MAP_LOC_LINK_PT].toInt();
+		if (!pts.keys().contains(lkPtId)) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_FROM_JSON_LINKPT_ERR>::err_info_cn)
+				+ QString("location %1 ,link pt %2").arg(QString::number(id)).arg(QString::number(lkPtId));
+			return false;
+		}
+		QJsonArray jarr = jobj[JSON_MAP_LOC_ACTIONS].toArray();
+		this->clear();
+		for (auto& ter : jarr) {
+			SunnyTcsAction ac;
+			QString err;
+			if (!ac.fromJson(ter.toObject(), err)) {
+				this->clear();
+				throw QSTRING_GBK("指令解析错误") + err;
+				return false;
+			}
+			this->append(ac);
+		}
+		_id = id;
+		_name = name;
+		_linkedPt = pts[lkPtId];
+		this->setPos(jobj[JSON_MAP_LOC_SCENE_X].toInt(),jobj[JSON_MAP_LOC_SCENE_Y].toInt());
+		return true;
 	}
 	
+
 	virtual QJsonObject toJson()const override 
 	{ 
-		return QJsonObject(); 
+		QJsonObject jobj;
+		jobj[JSON_MAP_LOC_ID] = _id;
+		jobj[JSON_MAP_LOC_NAME] = _name;
+		jobj[JSON_MAP_LOC_LINK_PT] = _linkedPt->getElementId();
+		QJsonArray jarr;
+		auto iter = this->begin();
+		while (iter != this->end()) {
+			jarr.append(iter->toJson());
+			++iter;
+		}
+		jobj[JSON_MAP_LOC_ACTIONS] = jarr;
+		jobj[JSON_MAP_LOC_SCENE_X] = (qint32)(this->pos().x());
+		jobj[JSON_MAP_LOC_SCENE_Y] = (qint32)(this->pos().y());
+		return jobj;
 	}
 
 protected:

@@ -56,7 +56,6 @@ namespace graphic {
 			return QPointF(this->pos().x() + sendpt.x(), this->pos().y() + sendpt.y());
 		}
 
-
 	protected:
 		QRectF nextTextRect(qint32 index) {
 			qreal start_x = -_wid / 2 + 30;

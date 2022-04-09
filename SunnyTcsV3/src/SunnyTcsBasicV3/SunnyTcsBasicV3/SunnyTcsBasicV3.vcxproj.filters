@@ -160,6 +160,9 @@
     <ClInclude Include="SunnyTcsVehicleLib.h">
       <Filter>Header Files\map</Filter>
     </ClInclude>
+    <ClInclude Include="SunnyTcsTypeArg.h">
+      <Filter>Header Files\general</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SunnyTcsSingleCondition.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="SunnyTcsLogicParser.cpp">
       <Filter>Source Files\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsTypeArg.cpp">
+      <Filter>Source Files\general</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

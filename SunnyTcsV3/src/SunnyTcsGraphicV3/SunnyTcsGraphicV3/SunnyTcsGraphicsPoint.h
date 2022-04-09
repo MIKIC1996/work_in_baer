@@ -61,9 +61,21 @@ public:
 			!jobj.contains(JSON_MAP_PT_REALITY_Y) ||
 			!jobj.contains(JSON_MAP_PT_SPT_NAGAMODE)
 			) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_POINT_FROM_JSON_NO_TAG>::err_info_cn);
 			return false;
 		}
 		qint32 id = jobj[JSON_MAP_PT_ID].toInt();
+		if (id != _id) {
+			if (_ad->applyForPtId(id)) {
+				_ad->returnPtId(_id);
+			}
+			else {
+				throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR>::err_info_cn)
+					+ QSTRING_GBK(": point apply id %1").arg(QString::number(id));
+				return false;
+			}
+		}
+		
 		QString name = jobj[JSON_MAP_PT_NAME].toString();
 		qint32 absPos = jobj[JSON_MAP_PT_ABS_POS].toInt();
 		qint32 rx = jobj[JSON_MAP_PT_REALITY_X].toInt();
@@ -76,7 +88,11 @@ public:
 		_rxy._x = rx;
 		_rxy._y = ry;
 		_nagaMode = nagamode;
-		return false; 
+
+		SunnyTcsAgvCoordinate sxy = _cs->transformToScene(_rxy);
+		this->setPos(QPointF(sxy._x, sxy._y));
+
+		return true; 
 	}
 
 

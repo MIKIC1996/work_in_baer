@@ -56,5 +56,19 @@
         <file>res/image/selectAll.png</file>
         <file>res/image/MapEditorIcon.png</file>
         <file>res/image/ulsDeviceOn.png</file>
+        <file>res/image/add2.png</file>
+        <file>res/image/moveDown.png</file>
+        <file>res/image/moveUp.png</file>
+        <file>res/image/addLine.png</file>
+        <file>res/image/decLine.png</file>
+        <file>res/image/editAcn.png</file>
+        <file>res/image/dec.png</file>
+        <file>res/image/moveDownLine.png</file>
+        <file>res/image/moveUpLine.png</file>
+        <file>res/image/toBottom.png</file>
+        <file>res/image/toTop.png</file>
+        <file>res/image/setBackImage.png</file>
+        <file>res/image/agvMitshubishi.png</file>
+        <file>res/image/agvMitshubishi_selected.png</file>
     </qresource>
 </RCC>

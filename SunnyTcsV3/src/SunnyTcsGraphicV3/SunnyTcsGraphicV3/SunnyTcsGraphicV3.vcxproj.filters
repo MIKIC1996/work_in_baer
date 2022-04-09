@@ -23,6 +23,12 @@
     <Filter Include="Source Files\map">
       <UniqueIdentifier>{5baaffbd-0a3b-4be1-9445-2cefc18fc952}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\craft">
+      <UniqueIdentifier>{9ad9ab75-c81d-469c-bd35-f5f095ba143d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\craft">
+      <UniqueIdentifier>{c447cb6d-43d7-40b0-80be-601488646934}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SunnyTcsGraphicV3.cpp">
@@ -74,7 +80,16 @@
       <Filter>Source Files\map</Filter>
     </ClCompile>
     <ClCompile Include="SunnyTcsGraphicsMapGeneral.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\map</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsGraphicsCraftGeneral.cpp">
+      <Filter>Source Files\craft</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsGraphicsSonCraft.cpp">
+      <Filter>Source Files\craft</Filter>
+    </ClCompile>
+    <ClCompile Include="SunnyTcsGraphicsCraft.cpp">
+      <Filter>Source Files\craft</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +101,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsGraphicsCraftGeneral.h">
+      <Filter>Header Files\craft</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsGraphicsSonCraft.h">
+      <Filter>Header Files\craft</Filter>
+    </ClInclude>
+    <ClInclude Include="SunnyTcsGraphicsCraft.h">
+      <Filter>Header Files\craft</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

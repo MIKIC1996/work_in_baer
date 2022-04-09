@@ -200,13 +200,13 @@ namespace basic {
 
 		QByteArray body = bytes.mid(MSG_HEAD_LENGTH, _header->getMsgBodyLen());
 		while (ok && counter < (MSG_HEAD_LENGTH+_header->getMsgBodyLen())) {
-			SunnyTcsArg arg(SunnyTcsArg::fromBytes(std::move(body), ok));
-			if (!ok) {
-				_body->clear();
-				return counter;
-			}
-			_body->append(std::move(arg));
-			counter += arg.getSize();
+// 			SunnyTcsArg arg(SunnyTcsArg::fromBytes(std::move(body), ok));
+// 			if (!ok) {
+// 				_body->clear();
+// 				return counter;
+// 			}
+// 			_body->append(std::move(arg));
+// 			counter += arg.getSize();
 		}
 		return counter;
 	}
@@ -217,7 +217,7 @@ namespace basic {
 		Q_ASSERT(_body&&_header);
 		_header->updateTime();
 		QByteArray ret = _header->toBytes();
-		std::for_each(_body->begin(), _body->end(), [&ret](SunnyTcsArg& arg)->void { ret += arg.toBytes();});
+	//	std::for_each(_body->begin(), _body->end(), [&ret](SunnyTcsArg& arg)->void { ret += arg.toBytes();});
 		
 		return ret;
 	}
@@ -226,11 +226,11 @@ namespace basic {
 	QString SunnyTcsMessage::toString() const
 	{
 		QString str = _header->toString();
-		str += "-----------body---------\n";
-		std::for_each(_body->begin(), _body->end(), [&str](SunnyTcsArg& arg)->void {
-			str += arg.toString();
-		});
-		str += "-----------end----------\n";
+// 		str += "-----------body---------\n";
+// 		std::for_each(_body->begin(), _body->end(), [&str](SunnyTcsArg& arg)->void {
+// 			str += arg.toString();
+// 		});
+// 		str += "-----------end----------\n";
 		return str;
 	}
 

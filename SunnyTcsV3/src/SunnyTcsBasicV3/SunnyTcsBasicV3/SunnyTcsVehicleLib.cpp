@@ -3,9 +3,8 @@
 namespace basic {
 
 
-
-
-
+	QMap<qint32, SunnyTcsAgvCode> I_SunnyTcsVehicleFactory::_vehicleSupported;
+	bool I_SunnyTcsVehicleFactory::isInited = initVehicleSupportedMap();
 
 	bool SunnyTcsVehicle_normal::updateData(const QByteArray & data)
 	{
@@ -51,5 +50,23 @@ namespace basic {
 	{
 		return false;
 	}
+
+
+
+	SunnyTcsVehicle * SunnyTcsBasicVehicleFactory::createVehicleByCodeId(qint32 id)
+	{
+
+		if (id == vehicle_normal._agvType) {
+			return new SunnyTcsVehicle_normal(0);
+		}
+		else if(id== vehicle_mitsubishi._agvType){
+			return new SunnyTcsVehicle_mitsubishi_battery(0);
+		}
+		else if (id == vehicle_daimler_engine._agvType) {
+			return new SunnyTcsVehicle_daimer_engine(0);
+		}
+		return nullptr;
+	}
+
 
 }

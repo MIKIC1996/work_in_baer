@@ -7,6 +7,81 @@
 namespace basic {
 
 
+	template<typename _Ty>
+	class SunnyTcsUniqueIdManager {
+	public:
+		typedef std::priority_queue<_Ty, std::vector<_Ty>, std::greater<_Ty>> container;
+
+		SunnyTcsUniqueIdManager() :_que() {
+			supplyId();
+		}
+		virtual ~SunnyTcsUniqueIdManager() {}
+
+		_Ty  getNextId() {
+			supplyId();
+			_Ty ret = _que.top();
+			_que.pop();
+			return ret;
+		}
+
+		bool applyForId(_Ty id) {
+			Q_ASSERT(id > 0);
+			supplyId();
+			container temp;
+			bool finded = false;
+			_Ty topVal = 0;
+			while (_que.size() > 0) {
+				topVal = _que.top();
+				if (topVal != id) {
+					temp.push(topVal);
+				}
+				else {
+					finded = true;
+					if (_que.size() == 1) {
+						//已经是最后一个了，必须先补充下
+						supplyId();
+					}
+				}
+				_que.pop();
+			}
+			*_que = temp;
+			if (!finded) {	//现存中没找到目标
+				if (topVal >= id) {
+					return false;
+				}
+
+				while (topVal <= id) {
+					++topVal; //自增 1
+					if (topVal != id) {
+						_que.push(topVal);
+					}
+				}
+			}
+			return true;
+		}
+
+		void returnId(_Ty id) {
+			_que.push(id);
+		}
+
+	protected:
+		void supplyId() {
+			if (_que.empty()) {
+				_que.push(1);
+				_que.push(2);
+			}
+			else if (_que.size() == 1) {
+				_que.push(_que.top() + 1);
+			}
+		}
+
+	protected:
+		container _que;
+	};
+
+
+	using SunnyTcsGeneralIdManager = SunnyTcsUniqueIdManager<qint32>;
+
 
 
 	//二进制数值转十进制
@@ -96,6 +171,8 @@ namespace basic {
 		public:
 			static constexpr bool isLocalStored = sizeof(_Functor) <= callable_storage_size;
 			typedef std::integral_constant<bool, isLocalStored > isStoredLocally;
+			typedef typename std::is_trivially_destructible<_Functor>::type  is_trivial_detor;
+
 
 			static void init_functor(SunnyTcsAnyData& dst, _Functor&& f) {
 				_init_functor_aux(dst, std::forward<_Functor>(f), isStoredLocally());//是否存储于本地
@@ -138,7 +215,16 @@ namespace basic {
 			}
 
 			static void _delete_functor_aux(SunnyTcsAnyData& dst, std::true_type) {
+				
+			}
+
+			static void _delete_functor_aux_is_trivial_detor(SunnyTcsAnyData& dst, std::true_type) {
+				memset(dst.access(), 0, callable_storage_size);
+			}
+
+			static void _delete_functor_aux_is_trivial_detor(SunnyTcsAnyData& dst, std::false_type) {
 				dst.access<_Functor>().~_Functor();
+				_delete_functor_aux_is_trivial_detor(dst, std::true_type());
 			}
 
 			static void _delete_functor_aux(SunnyTcsAnyData& dst, std::false_type) {

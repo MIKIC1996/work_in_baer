@@ -4,5 +4,6 @@
 
 #include "SunnyTcsGraphicsModel.h"
 #include "SunnyTcsGraphicsVehicleLib.h"
+#include "SunnyTcsGraphicsCraft.h"
 
 

@@ -28,7 +28,7 @@
 #include <shared_mutex>
 #include <set>
 #include <QRegExp>
-
+#include <type_traits>
 #include "SunnyTcsPromise.hpp"
 
 #ifndef BUILD_STATIC

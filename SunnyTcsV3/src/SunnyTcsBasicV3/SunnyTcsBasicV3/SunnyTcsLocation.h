@@ -25,7 +25,7 @@ namespace basic {
 		virtual bool setAttribution(QString key, SunnyTcsArg arg) override;
 
 		//×ÔÉíÐéº¯Êý
-		virtual bool fromJson(QJsonObject& jobj) { return false; }
+		virtual bool fromJson(QJsonObject& jobj ,const QHash<qint32,SunnyTcsPoint*>& pts) { return false; }
 		virtual QJsonObject toJson()const { return QJsonObject(); }
 
 	protected:

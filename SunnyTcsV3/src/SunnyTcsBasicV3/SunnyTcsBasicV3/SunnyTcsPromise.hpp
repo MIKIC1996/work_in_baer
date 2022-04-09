@@ -7,18 +7,25 @@
 
 //地图数据采用 json格式 进行服务间传输，其json字段定义如下
 // MODEL
-#define JSON_MAP_MODEL_ID		"JSON_MAP_MODEL_ID"
-#define JSON_MAP_MODEL_NAME		"JSON_MAP_MODEL_NAME"
-#define JSON_MAP_MODEL_WIDTH	"JSON_MAP_MODEL_WIDTH"
-#define JSON_MAP_MODEL_HEIGHT	"JSON_MAP_MODEL_HEIGHT"
-#define JSON_MAP_MODEL_RESOLUTION "JSON_MAP_MODEL_RESOLUTION"
+#define JSON_MAP_MODEL_ID				"JSON_MAP_MODEL_ID"
+#define JSON_MAP_MODEL_NAME				"JSON_MAP_MODEL_NAME"
+#define JSON_MAP_MODEL_WIDTH			"JSON_MAP_MODEL_WIDTH"
+#define JSON_MAP_MODEL_HEIGHT			"JSON_MAP_MODEL_HEIGHT"
+#define JSON_MAP_MODEL_RESOLUTION		"JSON_MAP_MODEL_RESOLUTION"
+#define JSON_MAP_MODEL_TIME				"JSON_MAP_MODEL_TIME"
+#define JSON_MAP_MODEL_COORSYS			"JSON_MAP_MODEL_COORSYS"
+#define JSON_MAP_MODEL_POINTS			"JSON_MAP_MODEL_POINTS"
+#define JSON_MAP_MODEL_PATHS			"JSON_MAP_MODEL_PATHS"
+#define JSON_MAP_MODEL_LOCATIONS		"JSON_MAP_MODEL_LOCATIONS"
+#define JSON_MAP_MODEL_VEHICLES			"JSON_MAP_MODEL_VEHICLES"
+#define JSON_MAP_MODEL_AUTO_TRAFFIC		"JSON_MAP_MODEL_AUTO_TRAFFIC"
 
 //VECODE
-#define JSON_MAP_MODEL_VECODES  "JSON_MAP_MODEL_VECODES"
-#define JSON_MAP_MODEL_VECODES_PARAMS_COUNT  "JSON_MAP_MODEL_VECODES_PARAMS_COUNT"
-#define JSON_MAP_MODEL_VECODES_PARAMS_TYPE  "JSON_MAP_MODEL_VECODES_PARAMS_TYPE"
-#define JSON_MAP_MODEL_VECODES_SPT_NAGA  "JSON_MAP_MODEL_VECODES_SPT_NAGA"
-#define JSON_MAP_MODEL_VECODES_VALUE  "JSON_MAP_MODEL_VECODES_VALUE"
+#define JSON_MAP_MODEL_VECODES					"JSON_MAP_MODEL_VECODES"
+#define JSON_MAP_MODEL_VECODES_PARAMS_COUNT		"JSON_MAP_MODEL_VECODES_PARAMS_COUNT"
+#define JSON_MAP_MODEL_VECODES_PARAMS_TYPE		"JSON_MAP_MODEL_VECODES_PARAMS_TYPE"
+#define JSON_MAP_MODEL_VECODES_SPT_NAGA			"JSON_MAP_MODEL_VECODES_SPT_NAGA"
+#define JSON_MAP_MODEL_VECODES_VALUE			"JSON_MAP_MODEL_VECODES_VALUE"
 
 // CS
 #define JSON_MAP_CS_ID			"JSON_MAP_CS_ID"
@@ -38,18 +45,18 @@
 
 
 //PATHS
-#define JSON_MAP_PATH_ID		"JSON_MAP_PATH_ID"
-#define JSON_MAP_PATH_NAME		"JSON_MAP_PATH_NAME"
-#define JSON_MAP_PATH_ST_ID		"JSON_MAP_PATH_ST_ID"
-#define JSON_MAP_PATH_ED_ID		"JSON_MAP_PATH_ED_ID"
-#define JSON_MAP_PATH_CT_ID		"JSON_MAP_PATH_CT_ID"
+#define JSON_MAP_PATH_ID						"JSON_MAP_PATH_ID"
+#define JSON_MAP_PATH_NAME						"JSON_MAP_PATH_NAME"
+#define JSON_MAP_PATH_ST_ID						"JSON_MAP_PATH_ST_ID"
+#define JSON_MAP_PATH_ED_ID						"JSON_MAP_PATH_ED_ID"
+#define JSON_MAP_PATH_CT_ID						"JSON_MAP_PATH_CT_ID"
 #define JSON_MAP_PATH_SPT_POSI_DIRECTION		"JSON_MAP_PATH_SPT_POSI_DIRECTION"//支持前向
 #define JSON_MAP_PATH_SPT_NEGA_DIRECTION		"JSON_MAP_PATH_SPT_NEGA_DIRECTION" //支持后向
-#define JSON_MAP_PATH_POSI_SPD	"JSON_MAP_PATH_POSI_SPD"
-#define JSON_MAP_PATH_NEGA_SPD	"JSON_MAP_PATH_NEGA_SPD"
-#define JSON_MAP_PATH_IS_SCAN_ACTIVED "JSON_MAP_IS_SCAN_ACTIVED"
-#define JSON_MAP_PATH_POSI_SCAN		"JSON_MAP_POSI_SCAN"
-#define JSON_MAP_PATH_NEGA_SCAN		"JSON_MAP_NEGA_SCAN"
+#define JSON_MAP_PATH_POSI_SPD					"JSON_MAP_PATH_POSI_SPD"
+#define JSON_MAP_PATH_NEGA_SPD					"JSON_MAP_PATH_NEGA_SPD"
+#define JSON_MAP_PATH_IS_SCAN_ACTIVED			"JSON_MAP_IS_SCAN_ACTIVED"
+#define JSON_MAP_PATH_POSI_SCAN					"JSON_MAP_POSI_SCAN"
+#define JSON_MAP_PATH_NEGA_SCAN					"JSON_MAP_NEGA_SCAN"
 
 
 //vehicle
@@ -60,20 +67,34 @@
 #define JSON_MAP_VE_IP				"JSON_MAP_VE_IP"
 #define JSON_MAP_VE_PORT			"JSON_MAP_VE_PORT"
 #define JSON_MAP_VE_GROUP_ID		"JSON_MAP_VE_GROUP_ID"
+#define JSON_MAP_VE_SCENE_X			"JSON_MAP_VE_SCENE_X"
+#define JSON_MAP_VE_SCENE_Y			"JSON_MAP_VE_SCENE_Y"
+
 
 //location
 #define JSON_MAP_LOC_ID				"JSON_MAP_LOC_ID"
 #define JSON_MAP_LOC_NAME			"JSON_MAP_LOC_NAME"
 #define JSON_MAP_LOC_LINK_PT		"JSON_MAP_LOC_LINK_PT"
+#define JSON_MAP_LOC_PARAM_TYPES	"JSON_MAP_LOC_PARAM_TYPES"
 #define JSON_MAP_LOC_ACTIONS		"JSON_MAP_LOC_ACTIONS"//action
-#define JSON_MAP_LOC_ACTION_CODE			"JSON_MAP_LOC_ACTION_CODE"
-#define JSON_MAP_LOC_ACTION_PARAMS			"JSON_MAP_LOC_ACTION_PARAMS"
-#define JSON_MAP_LOC_ACTiON_PARAM_COUNTER	"JSON_MAP_LOC_ACTiON_PARAM_COUNTER"
+#define JSON_MAP_LOC_SCENE_X		"JSON_MAP_LOC_SCENE_X"
+#define JSON_MAP_LOC_SCENE_Y		"JSON_MAP_LOC_SCENE_Y"
+
 
 //sunnytcsarg
-#define JSON_ARG_TYPE "argType"
-#define JSON_ARG_SIZE "argSize"
-#define JSON_ARG_PARAM "argParam"
+#define JSON_ARG_TYPE				"JSON_ARG_TYPE"
+#define JSON_ARG_SIZE				"JSON_ARG_SIZE"
+#define JSON_ARG_PARAM				"JSON_ARG_PARAM"
+
+//action 指令
+#define JSON_ACTION_COMMAND_CODE	"JSON_ACTION_COMMAND_CODE"
+#define JSON_ACTION_PARAMS			"JSON_ACTION_PARAMS"
+
+
+
+
+
+
 
 
 //tag
@@ -94,6 +115,8 @@
 #define JSON_RANGE_COOR_INT32_ISARCH "rangeIsArch"
 #define JSON_RANGE_COOR_INT32_START_CONTAINED "rangeStartContained"
 #define JSON_RANGE_COOR_INT32_END_CONTAINED "rangeEndContained"
+
+
 
 
 
@@ -255,8 +278,6 @@ struct SunnyTcsErrorInfo<ERROR_DB_JSON_ERROR_TYPE>
 
 
 //图形库错误定义 范围14000 - 16000
-
-
 #define ERROR_GRAPHICS_POINT_OUT_SCENE 15001 // 点的绘制坐标超过了场景尺寸
 template<>
 struct SunnyTcsErrorInfo<ERROR_GRAPHICS_POINT_OUT_SCENE>
@@ -290,8 +311,187 @@ struct SunnyTcsErrorInfo<ERROR_GRAPHICS_VEHICLE_OUT_SCENE>
 };
 
 
+#define ERROR_GRAPHICS_LOCATION_NO_LINK_POINT 15004 //工位没有可以依附的点
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_NO_LINK_POINT>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_LOCATION_NO_LINK_POINT;
+	static constexpr char* err_info = "No point to link for location.";
+	static constexpr char* err_info_cn = "当前位置没有工位可以依附的点";
+};
+
+
+#define ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR 15011 //元素申请ID时错误
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_FROM_JSON_APPLY_ID_ERR;
+	static constexpr char* err_info = "error in applying new id.";
+	static constexpr char* err_info_cn = "元素申请ID时错误";
+};
+
+
+#define ERROR_GRAPHICS_COORSYS_FROM_JSON_NO_TAG 15021 // 坐标系JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_COORSYS_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_COORSYS_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in coordinate system json.";
+	static constexpr char* err_info_cn = "坐标系JSON解析缺少必要的标签项";
+};
+
+
+#define ERROR_GRAPHICS_COORSYS_FROM_JSON_AXIS_ERR 15022 // 坐标系的xy轴错误或者冲突
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_COORSYS_FROM_JSON_AXIS_ERR>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_COORSYS_FROM_JSON_AXIS_ERR;
+	static constexpr char* err_info = "axis of coordinate system error";
+	static constexpr char* err_info_cn = "坐标系的xy轴错误或者冲突";
+};
+
+
+
+#define ERROR_GRAPHICS_POINT_FROM_JSON_NO_TAG 15041 //点JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_POINT_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_POINT_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in point json.";
+	static constexpr char* err_info_cn = "点JSON解析缺少必要的标签项";
+};
+
+
+
+
+
+
+
+
+#define ERROR_GRAPHICS_PATH_FROM_JSON_NO_TAG 15061 //路径JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_PATH_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in path json.";
+	static constexpr char* err_info_cn = "路径JSON解析缺少必要的标签项";
+};
+
+
+
+#define ERROR_GRAPHICS_PATH_FROM_JSON_START_POINT_NO_ID 15062 //路径所要求的起点ID在点集中不存在
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_START_POINT_NO_ID>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_PATH_FROM_JSON_START_POINT_NO_ID;
+	static constexpr char* err_info = "path start id is unexisted in points hashmap.";
+	static constexpr char* err_info_cn = "路径所要求的起点ID在点集中不存在";
+};
+
+
+
+#define ERROR_GRAPHICS_PATH_FROM_JSON_END_POINT_NO_ID 15063 //路径所要求的终点ID在点集中不存在
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_END_POINT_NO_ID>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_PATH_FROM_JSON_END_POINT_NO_ID;
+	static constexpr char* err_info = "path end id is unexisted in points hashmap.";
+	static constexpr char* err_info_cn = "路径所要求的终点ID在点集中不存在";
+};
+
+
+#define ERROR_GRAPHICS_PATH_FROM_JSON_CTRL_POINT_NO_ID 15064 //路径所要求的控制点ID在点集中不存在
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_PATH_FROM_JSON_CTRL_POINT_NO_ID>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_PATH_FROM_JSON_CTRL_POINT_NO_ID;
+	static constexpr char* err_info = "path ctrl id is unexisted in points hashmap.";
+	static constexpr char* err_info_cn = "路径所要求的控制点ID在点集中不存在";
+};
+
+
+
+
+#define ERROR_GRAPHICS_LOCATION_FROM_JSON_NO_TAG 15081 //工位JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_LOCATION_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in location json.";
+	static constexpr char* err_info_cn = "工位JSON解析缺少必要的标签项";
+};
+
+
+
+#define ERROR_GRAPHICS_LOCATION_FROM_JSON_LINKPT_ERR 15082 //工位JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_LOCATION_FROM_JSON_LINKPT_ERR>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_LOCATION_FROM_JSON_LINKPT_ERR;
+	static constexpr char* err_info = "no link point in location json.";
+	static constexpr char* err_info_cn = "工位JSON解析中，不存在的连接点";
+};
+
+
+
+#define ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_TAG 15101 //车辆JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in vehicle json.";
+	static constexpr char* err_info_cn = "车辆JSON解析缺少必要的标签项";
+};
+
+
+#define ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_CODE 15102 //车辆JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_CODE>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_VEHICLE_FROM_JSON_NO_CODE;
+	static constexpr char* err_info = "no code in vehicle json.";
+	static constexpr char* err_info_cn = "车辆JSON解析记录的车辆码ID不存在";
+};
+
+
+
+#define ERROR_GRAPHICS_MODEL_FROM_JSON_NO_TAG 15121 //车辆JSON解析缺少必要的标签项
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_MODEL_FROM_JSON_NO_TAG>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_MODEL_FROM_JSON_NO_TAG;
+	static constexpr char* err_info = "no tag in model json.";
+	static constexpr char* err_info_cn = "模型JSON解析缺少必要的标签项";
+};
+
+
+#define ERROR_GRAPHICS_CRAFT_BUILDING_RELATION_BETWEEN_ERR_SONCRAFTS 15501
+template<>
+struct SunnyTcsErrorInfo<ERROR_GRAPHICS_CRAFT_BUILDING_RELATION_BETWEEN_ERR_SONCRAFTS>
+{
+	typedef unsigned int value_type;
+	static constexpr value_type value = ERROR_GRAPHICS_CRAFT_BUILDING_RELATION_BETWEEN_ERR_SONCRAFTS;
+	static constexpr char* err_info = "build relationship between son crafts  owned by unsame owners .";
+	static constexpr char* err_info_cn = "尝试在两个所属不同的子工序之间建立关系";
+};
+
+
 //异常处理，这里定义了本系统常用的 异常,异常时基于错误的， 错误不一定会产生异常，但异常一定是出现错误了
-//配置异常，读取配置文件或者数据库配置数据时，遇到错误的数据
+//配置异常，读取配置文件或者数据库配置数据时，遇到错误的数据 
 
 template<unsigned int err ,bool cn/*中文？*/ = useChinese>
 class SunnyTcsException : public std::exception {

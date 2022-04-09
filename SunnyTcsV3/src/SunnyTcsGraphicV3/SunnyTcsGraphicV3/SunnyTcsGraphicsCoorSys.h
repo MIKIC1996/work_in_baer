@@ -42,6 +42,7 @@ public:
 			!jobj.contains(JSON_MAP_CS_AXIS_X) ||
 			!jobj.contains(JSON_MAP_CS_AXIS_Y)
 			) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_COORSYS_FROM_JSON_NO_TAG>::err_info_cn);
 			return false;
 		}
 		qint32 id = jobj[JSON_MAP_CS_ID].toInt();
@@ -50,7 +51,11 @@ public:
 		qint32 ry = jobj[JSON_MAP_CS_SCENE_Y].toInt();
 		qint32 xpos = jobj[JSON_MAP_CS_AXIS_X].toInt();
 		qint32 ypos = jobj[JSON_MAP_CS_AXIS_Y].toInt();
-		if (xpos < 1 || xpos >4 || ypos < 1 || ypos >4)return false;
+		if (xpos < 1 || xpos >4 || ypos < 1 || ypos >4 || xpos == ypos) {
+			throw QSTRING_GBK(SunnyTcsErrorInfo<ERROR_GRAPHICS_COORSYS_FROM_JSON_AXIS_ERR>::err_info_cn);
+			return false;
+		}
+
 		E_SunnyTcsAxisDirection xaxis = static_cast<E_SunnyTcsAxisDirection>(xpos);
 		E_SunnyTcsAxisDirection yaxis = static_cast<E_SunnyTcsAxisDirection>(ypos);
 		//…Ë÷√÷µ

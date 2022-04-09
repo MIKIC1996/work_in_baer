@@ -278,7 +278,6 @@ namespace basic {
 		virtual SunnyTcsArg getAttribution(QString key, bool & ok) const override = 0;
 		virtual bool setAttribution(QString key, SunnyTcsArg arg) override = 0;
 
-
 	protected:
 		const SunnyTcsAgvCoordinate _rxy;//现实坐标
 		E_SunnyTcsAxisDirection _xpos;
@@ -421,7 +420,9 @@ namespace basic {
 	//工位接口,线程安全
 	class I_SunnyTcsLocation :public I_SunnyTcsElementData ,public QList<SunnyTcsAction> { //直接多继承Qlist,用着方便
 	public:
-		explicit I_SunnyTcsLocation(qint32 id) :I_SunnyTcsElementData(id),QList<SunnyTcsAction>(), _lock() {}
+		explicit I_SunnyTcsLocation(qint32 id) :I_SunnyTcsElementData(id),QList<SunnyTcsAction>(), _lock(),_paramTypes() {
+			_paramTypes << ARG_INT32 << ARG_INT32 << ARG_INT32;
+		}
 
 		I_SunnyTcsLocation(const I_SunnyTcsLocation&) = delete;
 
@@ -429,6 +430,7 @@ namespace basic {
 
 		I_SunnyTcsLocation& operator=(const I_SunnyTcsLocation&) = delete;
 
+		//getter
 		virtual SunnyTcsMapObject_tag getTag()const {
 			std::shared_lock<std::shared_mutex> lk(_lock);
 			return SunnyTcsMapObject_tag(Elocation, _id);
@@ -436,8 +438,15 @@ namespace basic {
 
 		virtual qint32 getLinkedPointId()const = 0;//相连的点
 
+		inline QVector<E_ARG_TYPE> getParamsType()const { std::shared_lock<std::shared_mutex> lk(_lock); return _paramTypes; }
+		inline qint32 getParamsCount()const { std::shared_lock<std::shared_mutex> lk(_lock); return _paramTypes.count(); }
+		
+		//setter
+		void setParamsType(QVector<E_ARG_TYPE> types) { std::unique_lock<std::shared_mutex> lk(_lock); _paramTypes = types; }
+
 	protected:
 		mutable std::shared_mutex _lock;
+		QVector<E_ARG_TYPE> _paramTypes;
 
 	};
 
@@ -512,6 +521,7 @@ namespace basic {
 				ref[ptr->getElementId()].append(ptr->getToPointId());
 			}
 		}
+
 
 		virtual I_SunnyTcsElementData* getElement(E_SunnyTcsMapObject_type type, qint32 id) {
 			return nullptr;
