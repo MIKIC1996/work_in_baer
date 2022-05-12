@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStructAndAlgorithm", "DataStructAndAlgorithm\DataStructAndAlgorithm.vcxproj", "{BBF9B446-48E5-4440-B098-D7D4D3C1857B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Debug|x64.ActiveCfg = Debug|x64
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Debug|x64.Build.0 = Debug|x64
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Debug|x86.ActiveCfg = Debug|Win32
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Debug|x86.Build.0 = Debug|Win32
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Release|x64.ActiveCfg = Release|x64
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Release|x64.Build.0 = Release|x64
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Release|x86.ActiveCfg = Release|Win32
+		{BBF9B446-48E5-4440-B098-D7D4D3C1857B}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4380D840-13D9-46B1-B8C6-69DC460F5999}
+	EndGlobalSection
+EndGlobal
