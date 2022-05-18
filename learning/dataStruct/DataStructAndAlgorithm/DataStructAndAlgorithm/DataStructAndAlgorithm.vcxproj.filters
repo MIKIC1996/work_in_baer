@@ -25,6 +25,18 @@
     <Filter Include="源文件\stack">
       <UniqueIdentifier>{b43c7605-c55f-4ba8-b1a8-54018e687671}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\string">
+      <UniqueIdentifier>{348e247c-6da5-4560-b637-a1c37a400e26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\string">
+      <UniqueIdentifier>{bdf67417-f360-47a9-87e6-2d47cb82ad6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tree">
+      <UniqueIdentifier>{2e5f266d-767a-4b2e-9930-0710b46b6540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\tree">
+      <UniqueIdentifier>{90f12c55-1264-440c-a7f2-6fbe49e2f684}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -42,6 +54,18 @@
     <ClInclude Include="Algorithm_antiBolan.h">
       <Filter>头文件\stack</Filter>
     </ClInclude>
+    <ClInclude Include="stack_interface.h">
+      <Filter>头文件\stack</Filter>
+    </ClInclude>
+    <ClInclude Include="seq_stored_stack.h">
+      <Filter>头文件\stack</Filter>
+    </ClInclude>
+    <ClInclude Include="string_interface.h">
+      <Filter>头文件\string</Filter>
+    </ClInclude>
+    <ClInclude Include="seq_stored_binary_tree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -58,6 +82,18 @@
     </ClCompile>
     <ClCompile Include="Algorithm_antiBolan.cpp">
       <Filter>源文件\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="stack_interface.cpp">
+      <Filter>源文件\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="seq_stored_stack.cpp">
+      <Filter>源文件\stack</Filter>
+    </ClCompile>
+    <ClCompile Include="string_interface.cpp">
+      <Filter>源文件\string</Filter>
+    </ClCompile>
+    <ClCompile Include="seq_stored_binary_tree.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

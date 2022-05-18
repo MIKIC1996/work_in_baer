@@ -155,7 +155,11 @@
     <ClInclude Include="line_table_interface.h" />
     <ClInclude Include="OList.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="seq_stored_binary_tree.h" />
+    <ClInclude Include="seq_stored_stack.h" />
+    <ClInclude Include="stack_interface.h" />
     <ClInclude Include="StaticList.h" />
+    <ClInclude Include="string_interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm_antiBolan.cpp" />
@@ -167,7 +171,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="seq_stored_binary_tree.cpp" />
+    <ClCompile Include="seq_stored_stack.cpp" />
+    <ClCompile Include="stack_interface.cpp" />
     <ClCompile Include="StaticList.cpp" />
+    <ClCompile Include="string_interface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

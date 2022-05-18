@@ -5,20 +5,21 @@
 #include <iostream>
 #include "StaticList.h"
 #include "OList.h"
+#include "Algorithm_antiBolan.h"
+#include "seq_stored_stack.h"
+#include "seq_stored_binary_tree.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
-	OList<int> con;
 	
-	con.insert(0, 4);
-	con.insert(0, 3);
-	con.insert(0, 2);
-	con.insert(0, 1);
 	
-	con.deleteElem(1);
+	seq_stored_binary_tree<int> t;
+	t.init();
+	assert(t.isEmpty());
 
-	con.print();
+
+	getchar();
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
