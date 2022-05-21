@@ -8,16 +8,32 @@
 #include "Algorithm_antiBolan.h"
 #include "seq_stored_stack.h"
 #include "seq_stored_binary_tree.h"
+#include "list_stored_binary_tree.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
 	
-	
-	seq_stored_binary_tree<int> t;
-	t.init();
-	assert(t.isEmpty());
+	list_stored_binary_tree<int> l;
+	l.setRoot(1);
+	auto iter = l.begin();
+	l.insertSonNode(iter, list_stored_binary_tree<int>::Left, 2);
+	l.insertSonNode(iter, list_stored_binary_tree<int>::Right, 3);
+	l.rearrange(list_stored_binary_tree<int>::Mid);
 
+	list_stored_binary_tree<int> l2(std::move(l));
+	
+
+	auto iter2 = l2.begin();
+	while (iter2 != l2.end()) {
+		std::cout << *iter2 << std::endl;
+		++iter2;
+	}
+	--iter2;
+	while (iter2 != l2.end()) {
+		std::cout << *iter2 << std::endl;
+		--iter2;
+	}
 
 	getchar();
 }

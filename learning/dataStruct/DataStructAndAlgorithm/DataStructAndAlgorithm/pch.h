@@ -15,6 +15,8 @@
 #include <iostream>
 #include <assert.h>
 #include <string>
+#include <algorithm>
+#include <vector>
 
 // TODO: 添加要在此处预编译的标头
 
