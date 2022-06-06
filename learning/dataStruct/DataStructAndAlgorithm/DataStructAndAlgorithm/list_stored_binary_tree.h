@@ -268,7 +268,6 @@ private:
 		list_stored_binary_tree<Elem> right_tree;
 		_deserialize_forward(left_son_tree_mid, left_son_tree_forward, left_tree);
 		_deserialize_forward(right_son_tree_mid, right_son_tree_forward, right_tree);
-
 		return;
 	}
 
@@ -507,10 +506,6 @@ private:
 		}
 	}
 
-
-
-	
-
 private:
 	
 	void _rearrange_forward(Node* cur,Link_type type) {
@@ -559,9 +554,7 @@ private:
 	//采用头节点设计,下标值为 -1
 	Node* _head; //头节点，是用来在遍历的时候充当 this->end（）的节点
 	Traverse_stategy _stategy;
-
 	Node* _root; //树的根节点
-
 	Node* _lastOne; //重排遍历的上一个
 
 };
