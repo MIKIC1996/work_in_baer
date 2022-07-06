@@ -1,5 +1,6 @@
 #pragma once
-
+#include <tuple>
+#include <functional>
 #define type_has_member_type_int(ty) (sizeof(test<ty>(0)) == 1)
 
 //SFINAE‘≠‘Ú
@@ -8,6 +9,8 @@ typedef struct
 {
 	char twoSize[2];
 } RT2;
+
+
 
 template<typename T>
 RT1 test( typename T::X const*) { return RT1(); }
