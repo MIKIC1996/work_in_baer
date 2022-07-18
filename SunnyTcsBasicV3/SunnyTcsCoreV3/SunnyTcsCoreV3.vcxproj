@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="core_action.h" />
     <ClInclude Include="core_craft.h" />
+    <ClInclude Include="core_db.h" />
     <ClInclude Include="core_defs.h" />
     <ClInclude Include="core_deps.h" />
     <ClInclude Include="core_subcraft.h" />

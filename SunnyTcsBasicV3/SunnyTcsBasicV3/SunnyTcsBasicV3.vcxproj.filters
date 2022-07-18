@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\graph">
+      <UniqueIdentifier>{a5813e1f-d142-4370-b2cd-cafb20868137}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\math">
+      <UniqueIdentifier>{4708a817-54c9-4924-9817-f6bdf2d61d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\raii">
+      <UniqueIdentifier>{afca38f3-c420-4d0b-b2f9-041df1ece65b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\db">
+      <UniqueIdentifier>{e1466f3f-19aa-4765-be43-abd019641ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\rpn">
+      <UniqueIdentifier>{3bd87ad4-6a62-4942-8cbc-4f26245de2fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -33,22 +48,10 @@
     <ClInclude Include="basic_general_lib_ini.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="basic_graph.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_graph_orthogonal.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_graph_orthogonal_ini.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="basic_object.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="basic_object_p.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_graph_adjmatrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="basic_binary_tree.h">
@@ -57,14 +60,59 @@
     <ClInclude Include="basic_binary_tree_sequential.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="basic_resource_manager.h">
+    <ClInclude Include="basic_stack.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="basic_resource_manager_shared.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="basic_graph.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_graph_adjmatrix.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_graph_algorithm.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_graph_orthogonal.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_graph_orthogonal_ini.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_graph_traits.h">
+      <Filter>头文件\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_math_array.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_math_array_variant.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_math_matrix.h">
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_math_matrix_variant.h">
+      <Filter>头文件\math</Filter>
     </ClInclude>
     <ClInclude Include="basic_math_object.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\math</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_resource_manager.h">
+      <Filter>头文件\raii</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_resource_manager_shared.h">
+      <Filter>头文件\raii</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_db.h">
+      <Filter>头文件\db</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_db_mysql.h">
+      <Filter>头文件\db</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_db_mysql_p.h">
+      <Filter>头文件\db</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_rpn.h">
+      <Filter>头文件\rpn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +123,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="basic_object.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_db_mysql.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

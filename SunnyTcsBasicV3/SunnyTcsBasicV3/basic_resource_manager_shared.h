@@ -59,17 +59,21 @@ public:
 
 		}
 
-
+		//api
 		ResourceType getValue()const {
 			return *m_res;
 		}
 
+		inline void reset() {
+			m_res.reset();
+		}
+
 		bool isNull()const {
-			return nullptr == m_res.get();
+			return !(bool)m_res;
 		}
 
 		operator bool()const {
-			return !this->isNull();
+			return (bool)m_res;
 		}
 
 	private:
@@ -115,11 +119,11 @@ public:
 		}
 
 		bool isNull()const {
-			return nullptr == m_res.get();
+			return !(bool)m_res;
 		}
 
 		operator bool()const {
-			return !this->isNull();
+			return (bool)m_res;
 		}
 
 	private:
@@ -166,6 +170,9 @@ public:
 
 	//assign
 	SunnyTcsSharedPtrResourceManager& operator=(SunnyTcsSharedPtrResourceManager const& var) = delete;
+
+	//已使用的资源数量
+	std::size_t usedCount()const { return m_used.count(); }
 
 	//获取下一个资源
 	SharedResource getNextSharedResource() {
@@ -214,6 +221,18 @@ public:
 			return  UniqueResource(new ResourceType(var), FunctorRaII(this));
 		}
 	}
+
+	//获取一个无效的 shared资源
+	inline SharedResource getInvaildSharedResource()const {
+		return SharedResource(nullptr, FunctorRaII(nullptr));
+	}
+
+	inline UniqueResource getInvaildUniqueResource()const {
+		return UniqueResource(nullptr, FunctorRaII(nullptr));
+	}
+
+	//获取一个无效的 unique资源
+
 
 #ifdef  STRICT_INTERFACE_CHECK
 	TCS_RESOURCE_MANAGER_INTERFACE_CHECK(Self)

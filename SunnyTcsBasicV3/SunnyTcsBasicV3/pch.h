@@ -10,7 +10,11 @@
 // 添加要在此处预编译的标头
 #include "framework.h"
 
+//限制
+#include <limits>
+
 //支持断言
+#include <iostream>
 #include <assert.h>
 
 #include <string>
@@ -21,8 +25,20 @@
 #include <map>
 #include <memory>
 #include <tuple>
-
+#include <variant>
 #include <thread>
 #include <mutex>
+
+
+//数据库
+#include <mysql.h>
+
+
+
+
+
+
+
+
 
 #endif //PCH_H

@@ -12,9 +12,9 @@ TCS_STATIC_ASSERT_HAS_INSERTED_TYPE(_Type, RMIY_3,UniqueResource)\
 TCS_STATIC_ASSERT_HAS_MEMBER_FUNCTION(_Type,RMMF_4,SharedResource,getNextSharedResource)\
 TCS_STATIC_ASSERT_HAS_MEMBER_FUNCTION(_Type,RMMF_5,UniqueResource,getNextUniqueResource)\
 TCS_STATIC_ASSERT_HAS_MEMBER_FUNCTION(_Type,RMMF_6,SharedResource,getDesignatedSharedResource,ResourceType const&)\
-TCS_STATIC_ASSERT_HAS_MEMBER_FUNCTION(_Type,RMMF_7,UniqueResource,getDesignatedUniqueResource,ResourceType const&)
-
-
+TCS_STATIC_ASSERT_HAS_MEMBER_FUNCTION(_Type,RMMF_7,UniqueResource,getDesignatedUniqueResource,ResourceType const&)\
+TCS_STATIC_ASSERT_HAS_CONST_MEMBER_FUNCTION(_Type,RMMF_8,SharedResource,getInvaildSharedResource)\
+TCS_STATIC_ASSERT_HAS_CONST_MEMBER_FUNCTION(_Type,RMMF_9,UniqueResource,getInvaildUniqueResource)
 
 //资源持有者的 接口标准
 #define TCS_RESOURCE_KEEPER_INTERFACE_CHECK(_Type)\

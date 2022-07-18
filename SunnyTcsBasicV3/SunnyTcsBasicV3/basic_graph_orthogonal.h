@@ -114,4 +114,3 @@ private:
 };
 
 
-static SunnyTcsOrthogonalListOrientedGraph<int, int, int>* inttest;

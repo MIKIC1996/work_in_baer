@@ -121,16 +121,19 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;SUNNYTCSBASICV3_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;SUNNYTCSBASICV3_EXPORTS;_WINDOWS;_USRDLL;TCS_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>E:\code\work_in_baer\SunnyTcsBasicV3\include\mysql;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>E:\code\work_in_baer\SunnyTcsBasicV3\depend;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;mysqlclient.lib;mysqlservices.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,23 +158,35 @@
   <ItemGroup>
     <ClInclude Include="basic_binary_tree.h" />
     <ClInclude Include="basic_binary_tree_sequential.h" />
+    <ClInclude Include="basic_db.h" />
+    <ClInclude Include="basic_db_mysql.h" />
+    <ClInclude Include="basic_db_mysql_p.h" />
     <ClInclude Include="basic_defs.h" />
     <ClInclude Include="basic_deps.h" />
     <ClInclude Include="basic_general_lib_ini.h" />
     <ClInclude Include="basic_graph.h" />
     <ClInclude Include="basic_graph_adjmatrix.h" />
+    <ClInclude Include="basic_graph_algorithm.h" />
     <ClInclude Include="basic_graph_orthogonal.h" />
     <ClInclude Include="basic_graph_orthogonal_ini.h" />
+    <ClInclude Include="basic_graph_traits.h" />
+    <ClInclude Include="basic_math_array.h" />
+    <ClInclude Include="basic_math_array_variant.h" />
+    <ClInclude Include="basic_math_matrix.h" />
+    <ClInclude Include="basic_math_matrix_variant.h" />
     <ClInclude Include="basic_math_object.h" />
     <ClInclude Include="basic_object.h" />
     <ClInclude Include="basic_object_p.h" />
     <ClInclude Include="basic_resource_manager.h" />
     <ClInclude Include="basic_resource_manager_shared.h" />
+    <ClInclude Include="basic_rpn.h" />
+    <ClInclude Include="basic_stack.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="basic_general_lib.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basic_db_mysql.cpp" />
     <ClCompile Include="basic_object.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">

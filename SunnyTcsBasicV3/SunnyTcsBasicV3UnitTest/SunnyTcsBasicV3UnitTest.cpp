@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 
 #include "iostream"
-#include "../SunnyTcsBasicV3/basic_general_lib_ini.h"
+#include "..\SunnyTcsBasicV3\basic_graph_adjmatrix.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -16,6 +16,18 @@ namespace SunnyTcsBasicV3UnitTest
 		{
 
 			
+		}
+
+		TEST_METHOD(VariantArrayTest)
+		{
+
+
+		}
+
+		TEST_METHOD(VariantMatrixTest)
+		{
+
+
 		}
 
 

@@ -8,16 +8,21 @@
 //库导出
 #define BASIC_EXPORT __declspec(dllexport)
 
+#define TCS_DEBUG
+
 //接口检测强度
+#ifdef  TCS_DEBUG
 #define STRICT_INTERFACE_CHECK
+#endif //  TCS_DEBUG
 
 
 #define TCS_TO_STR_2(expr) TCS_TO_STR_1(expr)  
 #define TCS_TO_STR_1(expr) TCS_TO_STR(expr)
 #define TCS_TO_STR(expr) #expr
 
-//类接口规范静态检测
 
+
+//类接口规范静态检测
 #define TCS_IS_HAS_INSERTED_TYPE(_Mark,_InsertType) \
 template<typename _Ty>\
 struct SunnyTcsHasInsertedType_##_Mark {\
@@ -58,8 +63,6 @@ static constexpr bool value = check(static_cast<_Ty*>(0)); \
 };
 
 
-
-
 #define TCS_CHECK_HAS_MEMBER_FUNCTION(_Type ,_Mark) \
  SunnyTcsHasMemFunc_##_Mark<_Type>::value
 
@@ -93,13 +96,9 @@ printf("[WARN ] [%s(%d)] : " fmt"\n",TrimFilePath(__FILE__),__LINE__,##__VA_ARGS
 #define LOG_ERROR(fmt, ...)   \
 printf("[ERROR] [%s(%d)] : " fmt"\n",TrimFilePath(__FILE__),__LINE__,##__VA_ARGS__)
 
-
-
 //静态断言
 #define TCS_STATIC_ASSERT(_Expr , _Decp) \
 static_assert(_Expr , #_Decp);
-
-
 
 //类似Qt的类数据成员隐藏
 #define TCS_DECLARE_PRIVATE(Class)\
@@ -128,12 +127,14 @@ public:
 	typedef Ty value_type;
 	typedef typename std::conditional< std::is_trivially_copyable<value_type>::value ,value_type , value_type const &>:: type TransferedType; 
 	static value_type getDefaultValue() { return std::is_arithmetic<value_type>::value ? 0 : value_type(); }
-	static value_type getMaxValue() { return 0; }
-	static value_type getMinValue() { return 0; }
-	static value_type getInvaildValue() { return -1; }
+	static value_type getMaxValue() 
+	{
+		return (std::numeric_limits<value_type>::max)(); //括号括起来，避免与windows宏函数混淆
+	}
+	static value_type getMinValue() {
+		return (std::numeric_limits<value_type>::min)(); 
+	}
 };
-
-
 
 
 //静态反射机制
@@ -321,3 +322,85 @@ TCS_STATIC_REFLECT_REGISTER_MARK2(__VA_ARGS__)\
 TCS_DEFINE_CLASS_SHCEMA2( ClassName ,\
 	TCS_STATIC_REFLECT_REGISTER_SCHEMA2(__VA_ARGS__)\
 )
+
+
+
+//静态反射机制3
+//上面的反射机制,采用标识类，无法做到运行时反射，我们可以采用字符串
+ //_Class ::FieldName的 取法，不受 const this 指针的影响
+#define TCS_DEFINE_CLASS_FIELD3( FieldName) \
+	std::make_tuple(#FieldName,&_Class::FieldName)
+
+
+ //StructSchema2 返回值不受const this指针影响
+ //动态下无法定义getClassFieldByName,因为无法确定返回值类型，你可以使用void*,但这意味着用户需要自己进行类型转换
+#define TCS_DEFINE_CLASS_SHCEMA3(ClassName,...)\
+inline auto StructSchema3() const {\
+	using _Class = ClassName;\
+	return std::make_tuple(__VA_ARGS__);\
+}\
+template<typename Functor>\
+void FieldsForEach3(Functor&& func){\
+	auto schema3 = StructSchema3();\
+	TupleForEach(schema3, [this ,&func](auto field)->void { func( (*this).*(std::get<1>(field)) ); });\
+}\
+template<typename Functor>\
+void FieldsForEach3(Functor&& func) const{\
+	auto schema3 = StructSchema3(); \
+	TupleForEach(schema3, [this, &func](auto field)->void { func((*this).*(std::get<1>(field))); }); \
+}
+
+ 
+
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_1(arg1) TCS_DEFINE_CLASS_FIELD3(arg1)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_2(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_1(arg2)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_3(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_2(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_4(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_3(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_5(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_4(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_6(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_5(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_7(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_6(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_8(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_7(arg2,##__VA_ARGS__)
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3_9(arg1,arg2,...) TCS_DEFINE_CLASS_FIELD3(arg1),TCS_STATIC_REFLECT_REGISTER_SCHEMA3_8(arg2,##__VA_ARGS__)
+
+
+ //在msvc中，必须启动标准预处理器才可以使用一下功能，因为msvc将__VA_ARGS__作为一个参数传给第二个宏函数
+#define TCS_STATIC_REFLECT_GET_PARM3(_1, _2 ,_3, _4, _5 , _6 ,_7 ,_8 ,_9 , func ,...) func 
+
+
+
+//用于TCS_DEFINE_CLASS_SCHEMA的 参数展开
+#define TCS_STATIC_REFLECT_REGISTER_SCHEMA3(arg1,...)\
+ TCS_STATIC_REFLECT_GET_PARM3( arg1,##__VA_ARGS__ ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_9 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_8 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_7 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_6 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_5 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_4 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_3 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_2 ,\
+ TCS_STATIC_REFLECT_REGISTER_SCHEMA3_1 )\
+(arg1 ,##__VA_ARGS__)
+
+
+//静态反射注册宏 ,TCS_STATIC_REFLECT_REGISTER_MARK2将所有给定的标识符进行类定义，TCS_DEFINE_CLASS_SHCEMA2创建StructSchema的等成员函数
+//TCS_STATIC_REFLECT_REGISTER_SCHEMA2负责展开 一系列TCS_DEFINE_CLASS_FIELD2（关联标识类和成员指针）
+#define TCS_STATIC_REFLECT3(ClassName ,...)\
+public:\
+TCS_DEFINE_CLASS_SHCEMA3( ClassName ,\
+	TCS_STATIC_REFLECT_REGISTER_SCHEMA3(__VA_ARGS__)\
+)
+
+
+
+//网络相关
+using IpType = std::string;
+using portType = uint16_t;
+
+
+
+
+
+
+
+
